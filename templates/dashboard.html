@@ -126,7 +126,7 @@
                 </div>
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush bg-transparent">
-                        {% for user in (User.query.order_by(User.xp.desc()).limit(5).all()) %}
+                        {% for user in top_users %}
                             <li class="list-group-item bg-transparent">
                                 <div class="d-flex align-items-center">
                                     <span class="leaderboard-rank {% if loop.index <= 3 %}top-3{% endif %}">{{ loop.index }}</span>

@@ -34,6 +34,9 @@ def dashboard():
     # Get recent forum posts
     recent_posts = ForumPost.query.order_by(desc(ForumPost.created_at)).limit(5).all()
     
+    # Get leaderboard
+    top_users = User.query.order_by(desc(User.xp)).limit(5).all()
+    
     # Calculate progress
     next_level_xp = current_user.level * 150
     progress_percentage = min(100, (current_user.xp / next_level_xp) * 100)
@@ -43,6 +46,7 @@ def dashboard():
                           enrolled_courses=enrolled_courses,
                           achievements=achievements,
                           recent_posts=recent_posts,
+                          top_users=top_users,
                           next_level_xp=next_level_xp,
                           progress_percentage=progress_percentage)
 
