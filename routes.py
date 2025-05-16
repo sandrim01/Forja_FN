@@ -190,26 +190,32 @@ def achievements():
 def admin_dashboard():
     if not current_user.is_admin():
         abort(403)
+    elif request.path == '/':
+        return redirect(url_for('main.admin_dashboard'))
         
     # Count users
     total_users = User.query.count()
     total_courses = Course.query.count()
     total_forum_posts = ForumPost.query.count()
     
-    # Count payments
-    total_payments = Payment.query.filter_by(status='completed').count()
+    # Count payments and calculate total revenue
+    completed_payments = Payment.query.filter_by(status='completed').all()
+    total_payments = len(completed_payments)
+    total_revenue = sum(payment.amount for payment in completed_payments)
     
-    # Recent users
+    # Recent users and payments
     recent_users = User.query.order_by(desc(User.created_at)).limit(10).all()
+    recent_payments = Payment.query.order_by(desc(Payment.created_at)).limit(5).all()
     
     return render_template('admin/dashboard.html',
                           title='Painel Administrativo',
                           total_users=total_users,
                           total_courses=total_courses,
                           total_payments=total_payments,
+                          total_revenue=total_revenue,
                           total_forum_posts=total_forum_posts,
                           recent_users=recent_users,
-                          ForumPost=ForumPost)
+                          recent_payments=recent_payments)
 
 @main_bp.route('/admin/users')
 @login_required

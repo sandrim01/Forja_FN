@@ -31,10 +31,9 @@ def login():
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
             
-            # Add special case for admin/admin123* credentials
-            if user.username == 'admin' and form.password.data == 'admin123*':
+            if user.is_admin():
                 flash('Bem-vindo, Administrador!', 'success')
-                return redirect(next_page or url_for('main.admin_dashboard'))
+                return redirect(url_for('main.admin_dashboard'))
             
             flash('Login realizado com sucesso!', 'success')
             return redirect(next_page or url_for('main.dashboard'))
