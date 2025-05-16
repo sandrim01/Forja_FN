@@ -1,0 +1,143 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}" class="text-gold">Fórum</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
+        </ol>
+    </nav>
+    
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="text-gold">{{ category.name }}</h1>
+            <p class="text-muted">{{ category.description }}</p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-md-end">
+            <div class="input-group">
+                <input type="text" id="forumSearch" class="form-control" placeholder="Buscar fóruns...">
+                <button class="btn btn-gold" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forums List -->
+    {% if forums %}
+        <div class="card mb-4">
+            <div class="card-header bg-navy">
+                <h5 class="text-gold mb-0">Fóruns em {{ category.name }}</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <tbody>
+                            {% for forum in forums %}
+                                <tr>
+                                    <td style="width: 60px;" class="text-center">
+                                        <i class="fas fa-comments fa-2x text-gold"></i>
+                                    </td>
+                                    <td>
+                                        <h5 class="mb-1"><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}" class="text-decoration-none">{{ forum.name }}</a></h5>
+                                        <p class="text-muted mb-0">{{ forum.description }}</p>
+                                    </td>
+                                    <td class="forum-stats d-none d-md-table-cell text-center" style="width: 120px;">
+                                        <span class="stats-number">{{ forum.topics.count() }}</span>
+                                        <span class="stats-text">Tópicos</span>
+                                    </td>
+                                    <td class="forum-stats d-none d-md-table-cell text-center" style="width: 120px;">
+                                        {% set reply_count = 0 %}
+                                        {% for topic in forum.topics %}
+                                            {% set reply_count = reply_count + topic.replies.count() %}
+                                        {% endfor %}
+                                        <span class="stats-number">{{ reply_count }}</span>
+                                        <span class="stats-text">Respostas</span>
+                                    </td>
+                                    <td class="d-none d-lg-table-cell" style="width: 250px;">
+                                        {% set latest_topic = forum.topics.order_by(ForumPost.created_at.desc()).first() %}
+                                        {% if latest_topic %}
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ latest_topic.author.get_rank_image() }}" width="40" height="40" class="me-2" alt="Patente">
+                                                <div>
+                                                    <a href="{{ url_for('forum.view_topic', topic_id=latest_topic.id) }}" class="text-gold text-decoration-none">{{ latest_topic.title|truncate(30) }}</a>
+                                                    <div class="small text-muted">
+                                                        <span>por {{ latest_topic.author.username }}</span>
+                                                        <span class="ms-2">{{ latest_topic.created_at.strftime('%d/%m/%Y') }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">Nenhum tópico ainda</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="card mb-4">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                <h4>Nenhum fórum encontrado</h4>
+                <p class="text-muted">Esta categoria não possui fóruns ativos no momento.</p>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Other Categories -->
+    <div class="card">
+        <div class="card-header bg-navy">
+            <h5 class="text-gold mb-0">Outras Categorias</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for other_category in ForumCategory.query.filter(ForumCategory.id != category.id).all() %}
+                    <div class="col-md-4 col-6 mb-3">
+                        <a href="{{ url_for('forum.category', category_id=other_category.id) }}" class="text-decoration-none">
+                            <div class="card h-100 bg-darker">
+                                <div class="card-body text-center py-3">
+                                    <h6 class="text-gold mb-0">{{ other_category.name }}</h6>
+                                    <small class="text-muted">{{ other_category.forums.count() }} fóruns</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Forum search functionality
+        const searchInput = document.getElementById('forumSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const forumRows = document.querySelectorAll('table tbody tr');
+                
+                forumRows.forEach(row => {
+                    const forumName = row.querySelector('h5').textContent.toLowerCase();
+                    const forumDescription = row.querySelector('p').textContent.toLowerCase();
+                    
+                    if (forumName.includes(searchTerm) || forumDescription.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <h1>Forje sua carreira militar na Marinha do Brasil</h1>
+        <p>Prepare-se para as provas de Cabo e Sargento com uma plataforma exclusiva para Fuzileiros Navais, desenvolvida por especialistas com experiência militar.</p>
+        <div>
+            <a href="{{ url_for('main.courses') }}" class="btn btn-gold btn-lg me-2">Ver Cursos</a>
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('auth.register') }}" class="btn btn-outline-gold btn-lg">Registrar</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Features Section -->
+    <section class="mb-5">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-graduation-cap fa-3x text-gold mb-3"></i>
+                        <h3>Conteúdo Especializado</h3>
+                        <p>Material didático desenvolvido por especialistas com foco nas provas militares da Marinha do Brasil.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-trophy fa-3x text-gold mb-3"></i>
+                        <h3>Sistema de Gamificação</h3>
+                        <p>Progrida de Recruta a Almirante enquanto estuda, ganhe XP, conquiste medalhas e suba no ranking.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-3x text-gold mb-3"></i>
+                        <h3>Comunidade Ativa</h3>
+                        <p>Compartilhe conhecimento e tire dúvidas com outros militares em nosso fórum comunitário.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Courses -->
+    <section class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-gold">Cursos em Destaque</h2>
+            <a href="{{ url_for('main.courses') }}" class="btn btn-outline-gold">Ver Todos</a>
+        </div>
+        <div class="row">
+            {% if featured_courses %}
+                {% for course in featured_courses %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card course-card">
+                            <div class="course-image" style="background-image: url('{% if course.thumbnail_url %}{{ course.thumbnail_url }}{% else %}https://pixabay.com/get/g8f6a94809cc0c6e6c6b6ed94fdc5721846d9acbf46f2d53878a73d3411f2cd8df56a969370a79c76feb459fa5d6de38050f25e6f20657ef75b24a05ed347b5d9_1280.jpg{% endif %}')"></div>
+                            <span class="course-price">R$ {{ course.price }}</span>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ course.title }}</h5>
+                                <p class="card-text text-muted">{{ course.description|truncate(100) }}</p>
+                            </div>
+                            <div class="card-footer d-flex justify-content-between align-items-center">
+                                <small class="text-muted">{{ course.lessons.count() }} aulas</small>
+                                <a href="{{ url_for('main.view_course', course_id=course.id) }}" class="btn btn-sm btn-primary">Ver Detalhes</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        Novos cursos em breve! Fique ligado para novidades.
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Testimonials and Leaderboard -->
+    <div class="row">
+        <!-- Testimonials -->
+        <div class="col-lg-7 mb-5">
+            <h2 class="text-gold mb-4">O que dizem nossos alunos</h2>
+            <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="https://pixabay.com/get/g5b7f0415d636d175476fab00acddf95a6023d3e3be6dad965f0174ba2b73da901529fe3637430d4238d2513eedb15d6c_1280.jpg" alt="Fuzileiro Naval" class="rounded-circle me-3" width="60" height="60">
+                                    <div>
+                                        <h5 class="mb-0">Carlos Silva</h5>
+                                        <div class="text-muted">3º Sargento FN</div>
+                                    </div>
+                                </div>
+                                <p class="mb-0">"Graças à Forja FN consegui me preparar adequadamente para a prova de Sargento. O sistema de gamificação tornou o estudo muito mais envolvente e os simulados são muito parecidos com as provas reais."</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="https://pixabay.com/get/g483c0b4808e2f0961ba6beed0250c2b17e87eb4b33e15c0bfb7acc844c48ad6eff50637152e321abc4d546dc17412c796b7361d6a720b8f08b406d4981ca3d09_1280.jpg" alt="Militar" class="rounded-circle me-3" width="60" height="60">
+                                    <div>
+                                        <h5 class="mb-0">André Martins</h5>
+                                        <div class="text-muted">Cabo FN</div>
+                                    </div>
+                                </div>
+                                <p class="mb-0">"O fórum comunitário foi essencial para tirar minhas dúvidas. Os professores são atenciosos e o conteúdo é extremamente objetivo, focado no que realmente cai na prova."</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Próximo</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="col-lg-5 mb-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="text-gold">Top Alunos</h2>
+                <a href="{{ url_for('main.leaderboard') }}" class="btn btn-sm btn-outline-gold">Ver Ranking Completo</a>
+            </div>
+            <div class="card">
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush bg-transparent">
+                        {% if leaderboard %}
+                            {% for user in leaderboard[:5] %}
+                                <li class="list-group-item bg-transparent">
+                                    <div class="d-flex align-items-center">
+                                        <span class="leaderboard-rank {% if loop.index <= 3 %}top-3{% endif %}">{{ loop.index }}</span>
+                                        <img src="{{ user.get_rank_image() }}" alt="Patente" width="40" height="40" class="me-3">
+                                        <div class="leaderboard-info">
+                                            <span class="leaderboard-name">{{ user.username }}</span>
+                                            <span class="leaderboard-level">{{ user.get_rank_name() }}</span>
+                                        </div>
+                                        <span class="leaderboard-xp">{{ user.xp }} XP</span>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item bg-transparent text-center py-4">
+                                <span class="text-muted">Seja o primeiro no ranking!</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <section class="text-center py-5 mb-5" style="background: linear-gradient(rgba(0, 0, 128, 0.8), rgba(0, 0, 128, 0.8)), url('https://pixabay.com/get/g7bfd76047c7e17a41ddab2b9bb7f6158cde0ca00dce19bc32d7b3c0db65a46836645eb6be43810fb6b12b7f5142be9b7c10ef519cbd289e5e1ef08fe1bf99e81_1280.jpg'); background-size: cover; background-position: center; border-radius: 8px;">
+        <h2 class="text-light mb-4">Pronto para iniciar sua jornada?</h2>
+        <p class="text-light mb-4 mx-auto" style="max-width: 600px;">Junte-se a centenas de Fuzileiros Navais que estão se preparando para avançar na carreira militar.</p>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-gold btn-lg">Começar Agora</a>
+    </section>
+</div>
+{% endblock %}

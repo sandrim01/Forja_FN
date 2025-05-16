@@ -1,0 +1,259 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}" class="text-gold">Fórum</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.category', category_id=post.forum.category.id) }}" class="text-gold">{{ post.forum.category.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.view_forum', forum_id=post.forum.id) }}" class="text-gold">{{ post.forum.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ post.title|truncate(30) }}</li>
+        </ol>
+    </nav>
+    
+    <!-- Topic Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="text-gold">{{ post.title }}</h1>
+            <p class="text-muted">
+                Iniciado por {{ post.author.username }} em {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}
+                <span class="ms-2 badge bg-navy">{{ post.replies.count() }} respostas</span>
+                <span class="ms-2 badge bg-navy">{{ post.view_count }} visualizações</span>
+            </p>
+        </div>
+        <div class="d-flex">
+            {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_teacher()) %}
+                <form method="POST" action="{{ url_for('forum.pin_topic', topic_id=post.id) }}" class="me-2">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-gold">
+                        <i class="fas {{ 'fa-thumbtack' if post.is_pinned else 'fa-thumbtack text-muted' }} me-1"></i>
+                        {{ 'Desafixar' if post.is_pinned else 'Fixar' }}
+                    </button>
+                </form>
+                <form method="POST" action="{{ url_for('forum.close_topic', topic_id=post.id) }}" class="me-2">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm btn-outline-gold">
+                        <i class="fas {{ 'fa-lock' if post.is_closed else 'fa-unlock' }} me-1"></i>
+                        {{ 'Reabrir' if post.is_closed else 'Fechar' }}
+                    </button>
+                </form>
+            {% endif %}
+            <a href="{{ url_for('forum.view_forum', forum_id=post.forum.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Voltar para o Fórum
+            </a>
+        </div>
+    </div>
+    
+    <!-- Topic Status Alerts -->
+    {% if post.is_pinned %}
+        <div class="alert alert-warning">
+            <i class="fas fa-thumbtack me-2"></i>
+            Este tópico foi fixado por um moderador.
+        </div>
+    {% endif %}
+    
+    {% if post.is_closed %}
+        <div class="alert alert-danger">
+            <i class="fas fa-lock me-2"></i>
+            Este tópico está fechado e não recebe novas respostas.
+        </div>
+    {% endif %}
+    
+    <!-- Original Post -->
+    <div class="card mb-4">
+        <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <img src="{{ post.author.get_rank_image() }}" width="40" height="40" class="me-2" alt="Patente">
+                <div>
+                    <h5 class="mb-0">{{ post.author.username }}</h5>
+                    <small class="text-muted">{{ post.author.get_rank_name() }}</small>
+                </div>
+            </div>
+            <small class="text-muted">{{ post.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+        </div>
+        <div class="card-body">
+            {{ post.content|safe }}
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center">
+            <div>
+                <span class="badge bg-navy">
+                    <i class="fas fa-medal me-1"></i>
+                    XP: {{ post.author.xp }}
+                </span>
+                <span class="badge bg-navy ms-2">
+                    <i class="fas fa-star me-1"></i>
+                    Nível: {{ post.author.level }}
+                </span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-gold" onclick="quotePost('{{ post.author.username }}', '{{ post.content|replace('\n', ' ')|replace("'", "\\'") }}')">
+                    <i class="fas fa-quote-left me-1"></i>
+                    Citar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Replies -->
+    <h4 class="text-gold mb-3">Respostas</h4>
+    
+    {% if replies.items %}
+        {% for reply in replies.items %}
+            <div class="card mb-3 {{ 'official-reply' if reply.is_official }}">
+                <div class="card-header {{ 'bg-navy' if reply.is_official else 'bg-darker' }} d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="{{ reply.author.get_rank_image() }}" width="40" height="40" class="me-2" alt="Patente">
+                        <div>
+                            <h5 class="mb-0">
+                                {{ reply.author.username }}
+                                {% if reply.is_official %}
+                                    <span class="badge bg-gold text-dark ms-2">Resposta Oficial</span>
+                                {% endif %}
+                            </h5>
+                            <small class="text-muted">{{ reply.author.get_rank_name() }}</small>
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ reply.created_at.strftime('%d/%m/%Y %H:%M') }}</small>
+                </div>
+                <div class="card-body">
+                    {{ reply.content|safe }}
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge bg-navy">
+                            <i class="fas fa-medal me-1"></i>
+                            XP: {{ reply.author.xp }}
+                        </span>
+                        <span class="badge bg-navy ms-2">
+                            <i class="fas fa-star me-1"></i>
+                            Nível: {{ reply.author.level }}
+                        </span>
+                    </div>
+                    <div>
+                        {% if current_user.is_authenticated and (current_user.is_admin() or current_user.is_teacher()) %}
+                            <form method="POST" action="{{ url_for('forum.mark_official', reply_id=reply.id) }}" class="d-inline-block me-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm {{ 'btn-outline-danger' if reply.is_official else 'btn-outline-gold' }}">
+                                    <i class="fas {{ 'fa-times' if reply.is_official else 'fa-check' }} me-1"></i>
+                                    {{ 'Remover Oficial' if reply.is_official else 'Marcar Oficial' }}
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('forum.award_xp', reply_id=reply.id) }}" class="d-inline-block me-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-gold">
+                                    <i class="fas fa-award me-1"></i>
+                                    Dar XP
+                                </button>
+                            </form>
+                        {% endif %}
+                        <button class="btn btn-sm btn-outline-gold" onclick="quotePost('{{ reply.author.username }}', '{{ reply.content|replace('\n', ' ')|replace("'", "\\'") }}')">
+                            <i class="fas fa-quote-left me-1"></i>
+                            Citar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        
+        <!-- Pagination -->
+        {% if replies.pages > 1 %}
+            <nav aria-label="Paginação de respostas" class="mb-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {{ 'disabled' if replies.page == 1 else '' }}">
+                        <a class="page-link" href="{{ url_for('forum.view_topic', topic_id=post.id, page=replies.prev_num) if replies.has_prev else '#' }}" tabindex="{{ '-1' if replies.page == 1 else '0' }}" aria-disabled="{{ 'true' if replies.page == 1 else 'false' }}">Anterior</a>
+                    </li>
+                    
+                    {% for page_num in range(1, replies.pages + 1) %}
+                        {% if page_num == replies.page %}
+                            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{ url_for('forum.view_topic', topic_id=post.id, page=page_num) }}">{{ page_num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <li class="page-item {{ 'disabled' if replies.page == replies.pages else '' }}">
+                        <a class="page-link" href="{{ url_for('forum.view_topic', topic_id=post.id, page=replies.next_num) if replies.has_next else '#' }}" aria-disabled="{{ 'true' if replies.page == replies.pages else 'false' }}">Próximo</a>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-info-circle me-2"></i>
+            Nenhuma resposta ainda. Seja o primeiro a responder!
+        </div>
+    {% endif %}
+    
+    <!-- Reply Form -->
+    {% if current_user.is_authenticated and not post.is_closed %}
+        <div class="card">
+            <div class="card-header bg-navy">
+                <h5 class="text-gold mb-0">Sua Resposta</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('forum.view_topic', topic_id=post.id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.content.label(class="form-label") }}
+                        {% if form.content.errors %}
+                            {{ form.content(class="form-control is-invalid", rows="6", id="replyContent") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.content.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.content(class="form-control", rows="6", id="replyContent") }}
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            Dica: Você pode usar formatação HTML básica, como &lt;b&gt;negrito&lt;/b&gt;, &lt;i&gt;itálico&lt;/i&gt;, &lt;ul&gt; e &lt;li&gt; para listas, etc.
+                        </small>
+                    </div>
+                    
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-gold") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% elif not current_user.is_authenticated %}
+        <div class="card bg-navy text-center">
+            <div class="card-body py-4">
+                <h5 class="text-gold mb-3">Participe da discussão!</h5>
+                <p class="text-light mb-4">Para responder a este tópico, você precisa estar logado.</p>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-gold">
+                    <i class="fas fa-sign-in-alt me-2"></i>Entrar
+                </a>
+                <a href="{{ url_for('auth.register') }}" class="btn btn-outline-gold ms-2">
+                    <i class="fas fa-user-plus me-2"></i>Criar Conta
+                </a>
+            </div>
+        </div>
+    {% elif post.is_closed %}
+        <div class="card bg-danger text-center">
+            <div class="card-body py-4">
+                <h5 class="text-light mb-3">Tópico Fechado</h5>
+                <p class="text-light mb-0">Este tópico foi fechado por um moderador e não aceita novas respostas.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function quotePost(username, content) {
+        const replyContent = document.getElementById('replyContent');
+        if (replyContent) {
+            const quote = `<blockquote>\n<strong>${username} escreveu:</strong>\n${content}\n</blockquote>\n\n`;
+            replyContent.value = quote + replyContent.value;
+            replyContent.focus();
+            // Scroll to the reply form
+            replyContent.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+</script>
+{% endblock %}

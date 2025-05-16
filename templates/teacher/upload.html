@@ -1,0 +1,287 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="text-gold">Enviar Material</h1>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="{{ url_for('main.teacher_dashboard') }}" class="btn btn-outline-gold">
+                <i class="fas fa-arrow-left me-2"></i>Voltar para o Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Course Selection -->
+    <div class="card mb-4">
+        <div class="card-header bg-navy">
+            <h5 class="text-gold mb-0">Selecionar Curso</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <div class="row">
+                    <div class="col-md-8 mb-3 mb-md-0">
+                        <select class="form-select" id="courseSelect" required>
+                            <option value="">Selecione um curso</option>
+                            {% for course in current_user.created_courses %}
+                                <option value="{{ course.id }}">{{ course.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-gold">Continuar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Upload Tabs -->
+    <div class="card">
+        <div class="card-header bg-navy">
+            <ul class="nav nav-tabs card-header-tabs" id="uploadTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="lesson-tab" data-bs-toggle="tab" data-bs-target="#lesson" type="button" role="tab" aria-controls="lesson" aria-selected="true">
+                        <i class="fas fa-book me-2"></i>Nova Aula
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="quiz-tab" data-bs-toggle="tab" data-bs-target="#quiz" type="button" role="tab" aria-controls="quiz" aria-selected="false">
+                        <i class="fas fa-question-circle me-2"></i>Novo Quiz
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="file-tab" data-bs-toggle="tab" data-bs-target="#file" type="button" role="tab" aria-controls="file" aria-selected="false">
+                        <i class="fas fa-file-pdf me-2"></i>Arquivo PDF
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="uploadTabsContent">
+                <!-- Lesson Tab -->
+                <div class="tab-pane fade show active" id="lesson" role="tabpanel" aria-labelledby="lesson-tab">
+                    <form>
+                        <div class="mb-3">
+                            <label for="lessonTitle" class="form-label">Título da Aula</label>
+                            <input type="text" class="form-control" id="lessonTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lessonOrder" class="form-label">Ordem de Exibição</label>
+                            <input type="number" class="form-control" id="lessonOrder" min="1" value="1" required>
+                            <small class="form-text text-muted">Define a posição desta aula na lista de conteúdos do curso.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="videoUrl" class="form-label">URL do Vídeo (YouTube)</label>
+                            <input type="url" class="form-control" id="videoUrl" placeholder="https://www.youtube.com/watch?v=...">
+                            <small class="form-text text-muted">Cole o link completo do vídeo do YouTube.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lessonContent" class="form-label">Conteúdo da Aula</label>
+                            <textarea class="form-control" id="lessonContent" rows="10" required></textarea>
+                            <small class="form-text text-muted">Você pode usar formatação HTML básica para melhorar o conteúdo.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="lessonXp" class="form-label">Recompensa XP</label>
+                            <input type="number" class="form-control" id="lessonXp" min="0" value="10" required>
+                            <small class="form-text text-muted">Quantidade de XP que o aluno ganhará ao concluir esta aula.</small>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-gold">Adicionar Aula</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Quiz Tab -->
+                <div class="tab-pane fade" id="quiz" role="tabpanel" aria-labelledby="quiz-tab">
+                    <form>
+                        <div class="mb-3">
+                            <label for="quizTitle" class="form-label">Título do Quiz</label>
+                            <input type="text" class="form-control" id="quizTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quizDescription" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="quizDescription" rows="3" required></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="timeLimit" class="form-label">Tempo Limite (minutos)</label>
+                                <input type="number" class="form-control" id="timeLimit" min="1" value="30" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="passingScore" class="form-label">Nota Mínima (%)</label>
+                                <input type="number" class="form-control" id="passingScore" min="0" max="100" value="70" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="quizXp" class="form-label">Recompensa XP</label>
+                                <input type="number" class="form-control" id="quizXp" min="0" value="50" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Questions Section -->
+                        <h5 class="text-gold mt-4 mb-3">Questões</h5>
+                        
+                        <div id="questionsContainer">
+                            <div class="card mb-3 bg-darker">
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="question1" class="form-label">Questão 1</label>
+                                        <textarea class="form-control" id="question1" rows="2" required></textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Alternativas</label>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-text">
+                                                <input class="form-check-input mt-0" type="radio" name="correctAnswer1" value="option1" checked>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Alternativa 1" required>
+                                        </div>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-text">
+                                                <input class="form-check-input mt-0" type="radio" name="correctAnswer1" value="option2">
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Alternativa 2" required>
+                                        </div>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-text">
+                                                <input class="form-check-input mt-0" type="radio" name="correctAnswer1" value="option3">
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Alternativa 3" required>
+                                        </div>
+                                        <div class="input-group mb-2">
+                                            <div class="input-group-text">
+                                                <input class="form-check-input mt-0" type="radio" name="correctAnswer1" value="option4">
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Alternativa 4" required>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="points1" class="form-label">Pontos</label>
+                                        <input type="number" class="form-control" id="points1" min="1" value="1" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-outline-gold" id="addQuestionBtn">
+                                <i class="fas fa-plus me-2"></i>Adicionar Questão
+                            </button>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-gold">Criar Quiz</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- File Upload Tab -->
+                <div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
+                    <form>
+                        <div class="mb-3">
+                            <label for="fileTitle" class="form-label">Título do Material</label>
+                            <input type="text" class="form-control" id="fileTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fileDescription" class="form-label">Descrição</label>
+                            <textarea class="form-control" id="fileDescription" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="associatedLesson" class="form-label">Associar à Aula</label>
+                            <select class="form-select" id="associatedLesson">
+                                <option value="">Selecione uma aula (opcional)</option>
+                                <option value="1">Aula 1: Introdução</option>
+                                <option value="2">Aula 2: Fundamentos</option>
+                            </select>
+                            <small class="form-text text-muted">Selecione a aula à qual este material está associado.</small>
+                        </div>
+                        <div class="mb-4">
+                            <label for="pdfFile" class="form-label">Arquivo PDF</label>
+                            <input class="form-control" type="file" id="pdfFile" accept=".pdf" required>
+                            <small class="form-text text-muted">Tamanho máximo: 16MB</small>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-gold">Enviar Arquivo</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle adding new questions
+        const addQuestionBtn = document.getElementById('addQuestionBtn');
+        const questionsContainer = document.getElementById('questionsContainer');
+        let questionCount = 1;
+        
+        if (addQuestionBtn && questionsContainer) {
+            addQuestionBtn.addEventListener('click', function() {
+                questionCount++;
+                
+                const questionCard = document.createElement('div');
+                questionCard.className = 'card mb-3 bg-darker';
+                questionCard.innerHTML = `
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label for="question${questionCount}" class="form-label mb-0">Questão ${questionCount}</label>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-question">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" id="question${questionCount}" rows="2" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Alternativas</label>
+                            <div class="input-group mb-2">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="radio" name="correctAnswer${questionCount}" value="option1" checked>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Alternativa 1" required>
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="radio" name="correctAnswer${questionCount}" value="option2">
+                                </div>
+                                <input type="text" class="form-control" placeholder="Alternativa 2" required>
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="radio" name="correctAnswer${questionCount}" value="option3">
+                                </div>
+                                <input type="text" class="form-control" placeholder="Alternativa 3" required>
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-text">
+                                    <input class="form-check-input mt-0" type="radio" name="correctAnswer${questionCount}" value="option4">
+                                </div>
+                                <input type="text" class="form-control" placeholder="Alternativa 4" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="points${questionCount}" class="form-label">Pontos</label>
+                            <input type="number" class="form-control" id="points${questionCount}" min="1" value="1" required>
+                        </div>
+                    </div>
+                `;
+                
+                questionsContainer.appendChild(questionCard);
+                
+                // Add event listener to remove button
+                const removeBtn = questionCard.querySelector('.remove-question');
+                removeBtn.addEventListener('click', function() {
+                    questionCard.remove();
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

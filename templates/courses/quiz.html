@@ -1,0 +1,185 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Quiz Introduction Card -->
+            <div class="card mb-4" id="quizIntro">
+                <div class="card-header bg-navy">
+                    <h4 class="text-gold mb-0">{{ quiz.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <h5 class="text-gold mb-3">Instruções do Quiz</h5>
+                    <p>{{ quiz.description }}</p>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-clock text-gold me-2 fa-fw"></i>
+                                <span>Tempo: {{ quiz.time_limit }} minutos</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-question-circle text-gold me-2 fa-fw"></i>
+                                <span>Questões: {{ quiz.questions.count() }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-award text-gold me-2 fa-fw"></i>
+                                <span>Nota mínima: {{ quiz.passing_score }}%</span>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-star text-gold me-2 fa-fw"></i>
+                                <span>XP: {{ quiz.xp_reward }} pontos</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Atenção:</strong> Uma vez iniciado, o tempo continuará correndo. Certifique-se de que está pronto para completar o quiz sem interrupções.
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('main.view_course', course_id=course.id) }}" class="btn btn-outline-gold">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar para o Curso
+                        </a>
+                        <button id="startQuizBtn" class="btn btn-gold">
+                            <i class="fas fa-play me-2"></i>Iniciar Quiz
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quiz Questions (Initially Hidden) -->
+            <div id="quizContainer" class="d-none">
+                <div class="card">
+                    <div class="card-header bg-navy">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="text-gold mb-0">{{ quiz.title }}</h4>
+                            <div class="quiz-timer" id="quizTimer" data-time-limit="{{ quiz.time_limit }}">{{ quiz.time_limit }}:00</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Progress Bar -->
+                        <div class="progress mb-4" style="height: 10px;">
+                            <div id="quizProgress" class="progress-bar bg-gold" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0/{{ quiz.questions.count() }}</div>
+                        </div>
+                        
+                        <!-- Questions Form -->
+                        <form id="quizForm" method="POST" action="{{ url_for('main.view_quiz', course_id=course.id, quiz_id=quiz.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                            {% if quiz.questions.all() %}
+                                {% for question in quiz.questions.all() %}
+                                    <div class="question-card" id="question{{ loop.index }}">
+                                        <h5 class="question-text">{{ loop.index }}. {{ question.text }}</h5>
+                                        
+                                        <input type="hidden" name="answer_{{ question.id }}" value="">
+                                        
+                                        {% for answer in question.answers.all() %}
+                                            <div class="answer-option" 
+                                                data-question-id="{{ question.id }}" 
+                                                data-answer-id="{{ answer.id }}">
+                                                {{ answer.text }}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endfor %}
+                                
+                                <div class="d-grid mt-4">
+                                    <button type="submit" class="btn btn-gold btn-lg">
+                                        <i class="fas fa-check-circle me-2"></i>Submeter Respostas
+                                    </button>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    Este quiz ainda não possui questões.
+                                </div>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Question Navigation -->
+                <div class="card mt-4">
+                    <div class="card-header bg-navy">
+                        <h5 class="text-gold mb-0">Questões</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                            {% for i in range(1, quiz.questions.count() + 1) %}
+                                <button class="btn btn-outline-gold question-nav-btn" onclick="navigateToQuestion({{ i }})">{{ i }}</button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quiz Results (Would be shown after submission in a real app) -->
+            <div id="quizResults" class="d-none">
+                <div class="card">
+                    <div class="card-header bg-navy">
+                        <h4 class="text-gold mb-0">Resultados do Quiz</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-4">
+                            <div class="display-1 text-gold mb-2">85%</div>
+                            <div class="text-success h5">Aprovado!</div>
+                            <p class="text-muted">Você respondeu 17 de 20 questões corretamente.</p>
+                        </div>
+                        
+                        <div class="row justify-content-center mb-4">
+                            <div class="col-md-8">
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar bg-gold" role="progressbar" style="width: 85%;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">85%</div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">Mínimo: {{ quiz.passing_score }}%</small>
+                                    <small class="text-muted">100%</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-success mb-4">
+                            <i class="fas fa-medal me-2"></i>
+                            <strong>Parabéns!</strong> Você ganhou {{ quiz.xp_reward }} XP por completar este quiz.
+                        </div>
+                        
+                        <div class="d-flex justify-content-center">
+                            <a href="{{ url_for('main.view_course', course_id=course.id) }}" class="btn btn-gold me-3">
+                                <i class="fas fa-arrow-left me-2"></i>Voltar para o Curso
+                            </a>
+                            <button class="btn btn-outline-gold">
+                                <i class="fas fa-search me-2"></i>Ver Gabarito
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/quiz.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const startQuizBtn = document.getElementById('startQuizBtn');
+        const quizIntro = document.getElementById('quizIntro');
+        const quizContainer = document.getElementById('quizContainer');
+        
+        if (startQuizBtn && quizIntro && quizContainer) {
+            startQuizBtn.addEventListener('click', function() {
+                quizIntro.classList.add('d-none');
+                quizContainer.classList.remove('d-none');
+                
+                // Initialize quiz
+                initializeQuiz();
+            });
+        }
+    });
+</script>
+{% endblock %}

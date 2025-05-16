@@ -1,0 +1,240 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="text-gold">Gerenciar Usuários</h1>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-outline-gold">
+                <i class="fas fa-arrow-left me-2"></i>Voltar para o Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Search and Filter -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="input-group">
+                        <input type="text" id="userSearch" class="form-control" placeholder="Buscar usuários...">
+                        <button class="btn btn-gold" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6 d-flex justify-content-md-end">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-gold active" data-filter="all">Todos</button>
+                        <button type="button" class="btn btn-outline-gold" data-filter="admin">Administradores</button>
+                        <button type="button" class="btn btn-outline-gold" data-filter="teacher">Professores</button>
+                        <button type="button" class="btn btn-outline-gold" data-filter="student">Alunos</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="card">
+        <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+            <h5 class="text-gold mb-0">Lista de Usuários</h5>
+            <button class="btn btn-sm btn-gold" disabled>
+                <i class="fas fa-plus me-1"></i>Novo Usuário
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuário</th>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Papel</th>
+                            <th>Status</th>
+                            <th>Data de Registro</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if users %}
+                            {% for user in users %}
+                                <tr>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% for role in user.roles %}
+                                            <span class="badge bg-navy">{{ role.name }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% if user.is_active %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-gold">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" {% if user.username == 'admin' %}disabled{% endif %}>
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">Nenhum usuário encontrado.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Paginação de usuários">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Anterior</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Próximo</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- User Edit Modal (Would be implemented with JavaScript in a real app) -->
+<div class="modal fade" id="userEditModal" tabindex="-1" aria-labelledby="userEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-darker">
+            <div class="modal-header bg-navy">
+                <h5 class="modal-title text-gold" id="userEditModalLabel">Editar Usuário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label for="editUsername" class="form-label">Nome de Usuário</label>
+                        <input type="text" class="form-control" id="editUsername">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Papel</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="roleAdmin" value="admin">
+                                <label class="form-check-label" for="roleAdmin">Administrador</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="roleTeacher" value="teacher">
+                                <label class="form-check-label" for="roleTeacher">Professor</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="roleStudent" value="student">
+                                <label class="form-check-label" for="roleStudent">Aluno</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="editIsActive">
+                        <label class="form-check-label" for="editIsActive">Usuário Ativo</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-gold">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // User filtering functionality
+        const filterButtons = document.querySelectorAll('[data-filter]');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get filter value
+                const filter = this.dataset.filter;
+                
+                // Filter the table rows (would be implemented with actual data in a real app)
+                const rows = document.querySelectorAll('tbody tr');
+                
+                if (filter === 'all') {
+                    rows.forEach(row => row.style.display = '');
+                } else {
+                    rows.forEach(row => {
+                        const roles = row.querySelector('td:nth-child(5)').textContent.toLowerCase();
+                        if (roles.includes(filter)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                }
+            });
+        });
+        
+        // User search functionality
+        const searchInput = document.getElementById('userSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('tbody tr');
+                
+                rows.forEach(row => {
+                    const username = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                    const name = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                    const email = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+                    
+                    if (username.includes(searchTerm) || name.includes(searchTerm) || email.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Edit user button functionality (would open modal in a real app)
+        const editButtons = document.querySelectorAll('.btn-outline-gold');
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // This would show the modal and populate it with user data in a real app
+                // For demo, we'll just log to console
+                console.log('Edit user:', this.closest('tr').querySelector('td:nth-child(2)').textContent);
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="45" fill="#1A1A1A" stroke="#D4AF37" stroke-width="3"/>
+  <text x="50" y="38" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#E0E0E0" text-anchor="middle">3º SARGENTO</text>
+  <polygon points="30,45 50,55 70,45" fill="none" stroke="#D4AF37" stroke-width="3"/>
+  <line x1="35" y1="65" x2="65" y2="65" stroke="#D4AF37" stroke-width="3" />
+</svg>

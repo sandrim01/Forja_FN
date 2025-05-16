@@ -1,0 +1,699 @@
+/* 
+Forja FN - Custom Military Theme
+Color Palette:
+- Navy Blue: #000080 (header, buttons)
+- Gold: #D4AF37 (highlights, borders)
+- Heraldic Red: #8B0000 (alerts, secondary buttons)
+- Dark Background: #1A1A1A (background)
+- Light Text: #E0E0E0 (primary text)
+*/
+
+/* Global Styles */
+:root {
+    --navy-blue: #000080;
+    --gold: #D4AF37;
+    --heraldic-red: #8B0000;
+    --dark-bg: #1A1A1A;
+    --darker-bg: #101010;
+    --lighter-bg: #2A2A2A;
+    --light-text: #E0E0E0;
+    --muted-text: #AAAAAA;
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: var(--light-text);
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: var(--gold);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #F8E9A1;
+    text-decoration: underline;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--light-text);
+    font-weight: 600;
+    margin-top: 0;
+}
+
+/* Header & Navigation */
+.navbar {
+    background-color: var(--navy-blue) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.navbar-brand {
+    color: var(--gold) !important;
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: var(--light-text);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+    color: var(--gold);
+}
+
+.dropdown-menu {
+    background-color: var(--darker-bg);
+    border: 1px solid var(--gold);
+}
+
+.dropdown-item {
+    color: var(--light-text);
+}
+
+.dropdown-item:hover, 
+.dropdown-item:focus {
+    background-color: var(--navy-blue);
+    color: var(--gold);
+}
+
+/* Button Styles */
+.btn-primary {
+    background-color: var(--navy-blue);
+    border-color: var(--navy-blue);
+    color: var(--light-text);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #00006a;
+    border-color: #00006a;
+    color: var(--gold);
+}
+
+.btn-secondary {
+    background-color: var(--heraldic-red);
+    border-color: var(--heraldic-red);
+    color: var(--light-text);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #700000;
+    border-color: #700000;
+}
+
+.btn-gold {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: var(--dark-bg);
+    font-weight: 600;
+}
+
+.btn-gold:hover,
+.btn-gold:focus {
+    background-color: #C0A030;
+    border-color: #C0A030;
+    color: var(--dark-bg);
+}
+
+.btn-outline-gold {
+    background-color: transparent;
+    border-color: var(--gold);
+    color: var(--gold);
+}
+
+.btn-outline-gold:hover,
+.btn-outline-gold:focus {
+    background-color: var(--gold);
+    color: var(--dark-bg);
+}
+
+/* Card Styles */
+.card {
+    background-color: var(--lighter-bg);
+    border: 1px solid var(--lighter-bg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: var(--navy-blue);
+    color: var(--light-text);
+    border-bottom: 2px solid var(--gold);
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-footer {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Forms */
+.form-control, .form-select {
+    background-color: var(--darker-bg);
+    border: 1px solid #444;
+    color: var(--light-text);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--darker-bg);
+    border-color: var(--gold);
+    box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+    color: var(--light-text);
+}
+
+.form-label {
+    color: var(--light-text);
+    font-weight: 500;
+}
+
+.input-group-text {
+    background-color: var(--navy-blue);
+    border: 1px solid var(--navy-blue);
+    color: var(--light-text);
+}
+
+/* Alert Styles */
+.alert-success {
+    background-color: #0A4D0A;
+    color: var(--light-text);
+    border-color: #146614;
+}
+
+.alert-warning {
+    background-color: #5C4500;
+    color: var(--light-text);
+    border-color: #8A6700;
+}
+
+.alert-danger {
+    background-color: var(--heraldic-red);
+    color: var(--light-text);
+    border-color: #A60000;
+}
+
+.alert-info {
+    background-color: #0C3B5B;
+    color: var(--light-text);
+    border-color: #165785;
+}
+
+/* Badges & Labels */
+.badge {
+    font-weight: 600;
+    padding: 0.4em 0.65em;
+}
+
+.badge-gold {
+    background-color: var(--gold);
+    color: var(--dark-bg);
+}
+
+.badge-navy {
+    background-color: var(--navy-blue);
+    color: var(--light-text);
+}
+
+.badge-red {
+    background-color: var(--heraldic-red);
+    color: var(--light-text);
+}
+
+/* Tables */
+.table {
+    color: var(--light-text);
+}
+
+.table thead th {
+    background-color: var(--navy-blue);
+    color: var(--light-text);
+    border-bottom: 2px solid var(--gold);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Gamification */
+.rank-badge {
+    display: inline-block;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.rank-badge img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 0.5rem;
+}
+
+.rank-name {
+    color: var(--gold);
+    font-weight: 600;
+    display: block;
+}
+
+.xp-bar {
+    background-color: var(--darker-bg);
+    border-radius: 4px;
+    height: 20px;
+    margin: 1rem 0;
+    overflow: hidden;
+}
+
+.xp-progress {
+    background-color: var(--gold);
+    height: 100%;
+    transition: width 0.5s ease;
+}
+
+.achievement {
+    display: inline-block;
+    text-align: center;
+    margin: 0.5rem;
+    opacity: 1;
+}
+
+.achievement.locked {
+    opacity: 0.4;
+}
+
+.achievement img {
+    width: 90px;
+    height: 90px;
+    margin-bottom: 0.5rem;
+}
+
+.achievement-name {
+    color: var(--gold);
+    font-weight: 600;
+    display: block;
+    margin-top: 0.5rem;
+}
+
+/* Leaderboard */
+.leaderboard-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--lighter-bg);
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+
+.leaderboard-item:hover {
+    transform: translateY(-2px);
+}
+
+.leaderboard-rank {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gold);
+    width: 40px;
+    text-align: center;
+}
+
+.leaderboard-rank.top-3 {
+    font-size: 1.5rem;
+}
+
+.leaderboard-info {
+    flex-grow: 1;
+    margin-left: 1rem;
+}
+
+.leaderboard-name {
+    font-weight: 600;
+    display: block;
+}
+
+.leaderboard-level {
+    display: block;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+}
+
+.leaderboard-xp {
+    font-weight: 700;
+    color: var(--gold);
+}
+
+/* Course Cards */
+.course-card {
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.4);
+}
+
+.course-image {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    border-bottom: 2px solid var(--gold);
+}
+
+.course-price {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: var(--gold);
+    color: var(--dark-bg);
+    font-weight: 700;
+    padding: 0.3rem 0.7rem;
+    border-radius: 4px;
+}
+
+/* Forum */
+.forum-card {
+    margin-bottom: 1rem;
+}
+
+.forum-stats {
+    text-align: center;
+    padding: 1rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stats-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+}
+
+.stats-text {
+    font-size: 0.85rem;
+    color: var(--muted-text);
+}
+
+.topic-item {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.topic-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.topic-meta {
+    font-size: 0.85rem;
+    color: var(--muted-text);
+    margin-top: 0.5rem;
+}
+
+.pinned-topic {
+    border-left: 4px solid var(--gold);
+    background-color: rgba(212, 175, 55, 0.1);
+}
+
+.official-reply {
+    border-left: 4px solid var(--navy-blue);
+    background-color: rgba(0, 0, 128, 0.1);
+}
+
+/* PIX Payment */
+.pix-container {
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: var(--lighter-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.qr-code-container {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.pix-copy-code {
+    background-color: var(--darker-bg);
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-family: monospace;
+    margin: 1rem 0;
+    word-break: break-all;
+}
+
+/* Utilities */
+.text-gold {
+    color: var(--gold) !important;
+}
+
+.text-navy {
+    color: var(--navy-blue) !important;
+}
+
+.text-red {
+    color: var(--heraldic-red) !important;
+}
+
+.border-gold {
+    border-color: var(--gold) !important;
+}
+
+.border-navy {
+    border-color: var(--navy-blue) !important;
+}
+
+.bg-navy {
+    background-color: var(--navy-blue) !important;
+}
+
+.bg-gold {
+    background-color: var(--gold) !important;
+    color: var(--dark-bg) !important;
+}
+
+.bg-darker {
+    background-color: var(--darker-bg) !important;
+}
+
+.bg-lighter {
+    background-color: var(--lighter-bg) !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+    .rank-badge img {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .achievement img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .forum-stats {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 1rem;
+    }
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9)), url('https://pixabay.com/get/g7d8ca72d5209cc1eaf53be1e277893b491ce6ca50f8443265e2f0991dd953a754fa989a29a1373fac781a8c384639a2837de1d396241399ea85fd38e7a0ecadb_1280.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 5rem 0;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hero h1 {
+    color: var(--light-text);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.hero p {
+    color: var(--muted-text);
+    font-size: 1.2rem;
+    max-width: 700px;
+    margin: 0 auto 2rem auto;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Course Content */
+.lesson-nav {
+    background-color: var(--lighter-bg);
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.lesson-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lesson-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lesson-item:last-child {
+    border-bottom: none;
+}
+
+.lesson-item.active {
+    background-color: var(--navy-blue);
+    border-left: 4px solid var(--gold);
+}
+
+.lesson-item a {
+    color: var(--light-text);
+    display: block;
+}
+
+.lesson-item a:hover {
+    text-decoration: none;
+    color: var(--gold);
+}
+
+.lesson-item.active a {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.lesson-item .lesson-number {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    line-height: 25px;
+    text-align: center;
+    background-color: var(--darker-bg);
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    font-size: 0.85rem;
+}
+
+/* Quiz Styles */
+.quiz-timer {
+    background-color: var(--navy-blue);
+    color: var(--light-text);
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.question-card {
+    margin-bottom: 2rem;
+    border-left: 4px solid var(--navy-blue);
+}
+
+.question-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.answer-option {
+    display: block;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--darker-bg);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.answer-option:hover {
+    background-color: rgba(0, 0, 128, 0.2);
+}
+
+.answer-option.selected {
+    background-color: var(--navy-blue);
+    color: var(--gold);
+    font-weight: 500;
+}
+
+/* Footer */
+footer {
+    background-color: var(--darker-bg);
+    padding: 3rem 0;
+    margin-top: 3rem;
+    border-top: 4px solid var(--navy-blue);
+}
+
+footer h5 {
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+footer ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+footer ul li {
+    margin-bottom: 0.75rem;
+}
+
+footer ul li a {
+    color: var(--muted-text);
+}
+
+footer ul li a:hover {
+    color: var(--gold);
+}
+
+.footer-bottom {
+    padding-top: 2rem;
+    margin-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    color: var(--muted-text);
+    font-size: 0.9rem;
+}
+
+.social-icons a {
+    display: inline-block;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    background-color: var(--navy-blue);
+    color: var(--light-text);
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    background-color: var(--gold);
+    color: var(--dark-bg);
+    transform: translateY(-3px);
+}

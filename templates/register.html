@@ -1,0 +1,157 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header bg-navy text-center py-3">
+                    <h2 class="text-gold mb-0">Criar Conta</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('auth.register') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.first_name.label(class="form-label") }}
+                                {% if form.first_name.errors %}
+                                    {{ form.first_name(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.first_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.first_name(class="form-control", placeholder="Seu nome") }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                {{ form.last_name.label(class="form-label") }}
+                                {% if form.last_name.errors %}
+                                    {{ form.last_name(class="form-control is-invalid") }}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.last_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {{ form.last_name(class="form-control", placeholder="Seu sobrenome") }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {% if form.username.errors %}
+                                {{ form.username(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.username(class="form-control", placeholder="Escolha um nome de usuário") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {% if form.email.errors %}
+                                {{ form.email(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.email(class="form-control", placeholder="Seu email") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {% if form.password.errors %}
+                                {{ form.password(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.password(class="form-control", placeholder="Crie uma senha forte") }}
+                            {% endif %}
+                            <small class="form-text text-muted">Sua senha deve ter pelo menos 8 caracteres.</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {% if form.confirm_password.errors %}
+                                {{ form.confirm_password(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.confirm_password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.confirm_password(class="form-control", placeholder="Confirme sua senha") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-gold btn-lg") }}
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3">
+                    <p class="mb-0">Já tem uma conta? <a href="{{ url_for('auth.login') }}" class="text-gold">Entrar</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Military Ranks Preview -->
+    <div class="row justify-content-center mt-5">
+        <div class="col-lg-10">
+            <h3 class="text-gold text-center mb-4">Progressão de Patentes na Plataforma</h3>
+            <div class="card">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-2 col-4 mb-3">
+                            <img src="{{ url_for('static', filename='images/ranks/rank1.svg') }}" width="70" height="70" alt="Recruta">
+                            <span class="rank-name d-block mt-2">Recruta</span>
+                            <small class="text-muted">Nível 1</small>
+                        </div>
+                        <div class="col-md-2 col-4 mb-3">
+                            <img src="{{ url_for('static', filename='images/ranks/rank3.svg') }}" width="70" height="70" alt="Cabo">
+                            <span class="rank-name d-block mt-2">Cabo</span>
+                            <small class="text-muted">Nível 3</small>
+                        </div>
+                        <div class="col-md-2 col-4 mb-3">
+                            <img src="{{ url_for('static', filename='images/ranks/rank5.svg') }}" width="70" height="70" alt="2º Sargento">
+                            <span class="rank-name d-block mt-2">2º Sargento</span>
+                            <small class="text-muted">Nível 5</small>
+                        </div>
+                        <div class="col-md-2 col-4 mb-3">
+                            <img src="{{ url_for('static', filename='images/ranks/rank7.svg') }}" width="70" height="70" alt="Suboficial">
+                            <span class="rank-name d-block mt-2">Suboficial</span>
+                            <small class="text-muted">Nível 7</small>
+                        </div>
+                        <div class="col-md-2 col-4 mb-3">
+                            <img src="{{ url_for('static', filename='images/ranks/rank9.svg') }}" width="70" height="70" alt="Capitão">
+                            <span class="rank-name d-block mt-2">Capitão</span>
+                            <small class="text-muted">Nível 9</small>
+                        </div>
+                        <div class="col-md-2 col-4 mb-3">
+                            <img src="{{ url_for('static', filename='images/ranks/rank10.svg') }}" width="70" height="70" alt="Almirante">
+                            <span class="rank-name d-block mt-2">Almirante</span>
+                            <small class="text-muted">Nível 10</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

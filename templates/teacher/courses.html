@@ -1,0 +1,189 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="text-gold">Meus Cursos</h1>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="{{ url_for('main.teacher_dashboard') }}" class="btn btn-outline-gold me-2">
+                <i class="fas fa-arrow-left me-2"></i>Voltar para o Dashboard
+            </a>
+            <a href="#" class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#newCourseModal">
+                <i class="fas fa-plus me-2"></i>Novo Curso
+            </a>
+        </div>
+    </div>
+    
+    <!-- Courses List -->
+    <div class="row">
+        {% if courses %}
+            {% for course in courses %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="course-image" style="height: 140px; background-image: url('{% if course.thumbnail_url %}{{ course.thumbnail_url }}{% else %}https://pixabay.com/get/g8391d6b8d021de7ffc3b0403cf9de509164cf687ea1b31cc1b28bf0f279b61c9481797f0bb6b916857e52e75305f1e1ece56f2ab8ccbf42049c283456e34e59b_1280.jpg{% endif %}'); background-size: cover; background-position: center;"></div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ course.title }}</h5>
+                            <p class="card-text text-muted">{{ course.description|truncate(120) }}</p>
+                            
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="badge bg-navy">{{ course.lessons.count() }} aulas</span>
+                                <span class="badge bg-gold text-dark">R$ {{ course.price }}</span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-users me-2 text-gold"></i>
+                                <span>{{ course.students.count() }} alunos matriculados</span>
+                            </div>
+                            
+                            <div class="progress mb-2" style="height: 8px;">
+                                {% set lesson_count = course.lessons.count() %}
+                                {% set quiz_count = course.quizzes.count() %}
+                                {% set progress = 0 %}
+                                {% if lesson_count > 0 %}
+                                    {% set progress = 100 %}
+                                {% endif %}
+                                <div class="progress-bar bg-gold" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="text-muted">{{ 'Curso completo' if progress == 100 else 'Curso incompleto' }}</small>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-group w-100">
+                                <a href="{{ url_for('main.view_course', course_id=course.id) }}" class="btn btn-outline-gold">
+                                    <i class="fas fa-eye me-1"></i> Visualizar
+                                </a>
+                                <a href="#" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editCourseModal{{ course.id }}">
+                                    <i class="fas fa-edit me-1"></i> Editar
+                                </a>
+                                <a href="#" class="btn btn-outline-danger" onclick="confirmDelete({{ course.id }})">
+                                    <i class="fas fa-trash me-1"></i> Excluir
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Edit Course Modal -->
+                <div class="modal fade" id="editCourseModal{{ course.id }}" tabindex="-1" aria-labelledby="editCourseModalLabel{{ course.id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content bg-darker">
+                            <div class="modal-header bg-navy">
+                                <h5 class="modal-title text-gold" id="editCourseModalLabel{{ course.id }}">Editar Curso</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="courseTitle{{ course.id }}" class="form-label">Título do Curso</label>
+                                        <input type="text" class="form-control" id="courseTitle{{ course.id }}" value="{{ course.title }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="courseDescription{{ course.id }}" class="form-label">Descrição</label>
+                                        <textarea class="form-control" id="courseDescription{{ course.id }}" rows="3" required>{{ course.description }}</textarea>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label for="coursePrice{{ course.id }}" class="form-label">Preço (R$)</label>
+                                            <input type="number" class="form-control" id="coursePrice{{ course.id }}" min="0" step="0.01" value="{{ course.price }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="courseThumbnail{{ course.id }}" class="form-label">URL da Imagem de Capa</label>
+                                            <input type="url" class="form-control" id="courseThumbnail{{ course.id }}" value="{{ course.thumbnail_url }}" placeholder="https://exemplo.com/imagem.jpg">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-gold">Salvar Alterações</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-book fa-4x text-muted mb-3"></i>
+                        <h4>Você ainda não tem cursos</h4>
+                        <p class="text-muted mb-4">Comece criando seu primeiro curso para ajudar os alunos em sua jornada de aprendizado.</p>
+                        <a href="#" class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#newCourseModal">
+                            <i class="fas fa-plus-circle me-2"></i>Criar Meu Primeiro Curso
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- New Course Modal -->
+<div class="modal fade" id="newCourseModal" tabindex="-1" aria-labelledby="newCourseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-darker">
+            <div class="modal-header bg-navy">
+                <h5 class="modal-title text-gold" id="newCourseModalLabel">Criar Novo Curso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newCourseForm">
+                    <div class="mb-3">
+                        <label for="newCourseTitle" class="form-label">Título do Curso</label>
+                        <input type="text" class="form-control" id="newCourseTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newCourseDescription" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="newCourseDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="newCoursePrice" class="form-label">Preço (R$)</label>
+                            <input type="number" class="form-control" id="newCoursePrice" min="0" step="0.01" value="99.90" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="newCourseThumbnail" class="form-label">URL da Imagem de Capa</label>
+                            <input type="url" class="form-control" id="newCourseThumbnail" placeholder="https://exemplo.com/imagem.jpg">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-gold" id="createCourseBtn">Criar Curso</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function confirmDelete(courseId) {
+        if (confirm('Tem certeza que deseja excluir este curso? Esta ação não pode ser desfeita.')) {
+            // In a real app, this would submit to a delete endpoint
+            console.log(`Deletando curso ${courseId}`);
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle course creation
+        const createCourseBtn = document.getElementById('createCourseBtn');
+        if (createCourseBtn) {
+            createCourseBtn.addEventListener('click', function() {
+                const form = document.getElementById('newCourseForm');
+                if (form.checkValidity()) {
+                    // In a real app, this would submit the form
+                    alert('Curso criado com sucesso!');
+                    // Close modal and potentially refresh page
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('newCourseModal'));
+                    modal.hide();
+                } else {
+                    form.reportValidity();
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

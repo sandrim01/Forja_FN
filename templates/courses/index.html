@@ -1,0 +1,144 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="text-gold">Cursos Disponíveis</h1>
+            <p class="text-muted">Explore nossa seleção de cursos especializados para Fuzileiros Navais.</p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-md-end">
+            <div class="input-group">
+                <input type="text" id="courseSearch" class="form-control" placeholder="Buscar cursos...">
+                <button class="btn btn-gold" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Categories Filters -->
+    <div class="mb-5">
+        <div class="btn-group">
+            <button type="button" class="btn btn-outline-gold active" data-filter="all">Todos</button>
+            <button type="button" class="btn btn-outline-gold" data-filter="matematica">Matemática</button>
+            <button type="button" class="btn btn-outline-gold" data-filter="portugues">Português</button>
+            <button type="button" class="btn btn-outline-gold" data-filter="navais">Conhecimentos Navais</button>
+            <button type="button" class="btn btn-outline-gold" data-filter="tattica">Tática Militar</button>
+        </div>
+    </div>
+
+    <!-- Courses Grid -->
+    <div class="row" id="coursesGrid">
+        {% if courses %}
+            {% for course in courses %}
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="card course-card h-100">
+                        <div class="course-image" style="background-image: url('{% if course.thumbnail_url %}{{ course.thumbnail_url }}{% else %}https://pixabay.com/get/g144e76ca8988062a978341e12b81b9b1d73fdc087356426a459abdb4bac6dc8ae2e7d71417036cd82d4d0df0b3ea6e83ed7b1c5c980fe1b6212d1a02a8c8661f_1280.jpg{% endif %}')"></div>
+                        <span class="course-price">R$ {{ course.price }}</span>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ course.title }}</h5>
+                            <p class="card-text text-muted">{{ course.description|truncate(100) }}</p>
+                            
+                            <!-- Course Statistics -->
+                            <div class="d-flex justify-content-between text-muted small mb-3">
+                                <span><i class="fas fa-book-open me-1"></i> {{ course.lessons.count() }} aulas</span>
+                                <span><i class="fas fa-clock me-1"></i> {{ (course.lessons.count() * 15)|int }} min</span>
+                            </div>
+                            
+                            <!-- Author Info -->
+                            <div class="d-flex align-items-center mb-3">
+                                <img src="{{ course.author.profile_image_url or url_for('static', filename='images/ranks/rank10.svg') }}" alt="{{ course.author.username }}" class="rounded-circle me-2" width="30" height="30">
+                                <small class="text-muted">Professor: {{ course.author.username }}</small>
+                            </div>
+                        </div>
+                        <div class="card-footer d-grid">
+                            <a href="{{ url_for('main.view_course', course_id=course.id) }}" class="btn btn-primary">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> Novos cursos estão sendo preparados. Fique atento para novidades!
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Featured Military Training Image -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-navy overflow-hidden">
+                <div class="row g-0">
+                    <div class="col-md-7">
+                        <img src="https://pixabay.com/get/g25068daa43793999638f687a7833ea70ff4c8f6e9bcaad2fbfdbb4ab08243e7fa4b14f535b6542db1ef632e93be0625c222cca37b4d28190424a42f4d354531f_1280.jpg" alt="Treinamento Militar" class="img-fluid" style="height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card-body d-flex flex-column justify-content-center h-100">
+                            <h3 class="text-gold">Preparando o Futuro da Força Naval</h3>
+                            <p class="text-light">Nossos cursos são desenvolvidos por especialistas com experiência nas Forças Armadas para preparar você com excelência para as provas de progressão de carreira.</p>
+                            <a href="#" class="btn btn-gold align-self-start">Saiba Como Funciona</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Course filtering functionality
+        const filterButtons = document.querySelectorAll('[data-filter]');
+        const courseCards = document.querySelectorAll('.course-card');
+        
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                
+                // In a real application, this would filter based on course categories
+                // For demo purposes, we'll just show/hide randomly
+                if (filter === 'all') {
+                    courseCards.forEach(card => {
+                        card.closest('.col-md-4').style.display = 'block';
+                    });
+                } else {
+                    courseCards.forEach(card => {
+                        // Simulate filtering (would use actual category data in real app)
+                        const show = Math.random() > 0.5;
+                        card.closest('.col-md-4').style.display = show ? 'block' : 'none';
+                    });
+                }
+            });
+        });
+        
+        // Course search functionality
+        const searchInput = document.getElementById('courseSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                courseCards.forEach(card => {
+                    const title = card.querySelector('.card-title').textContent.toLowerCase();
+                    const description = card.querySelector('.card-text').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                        card.closest('.col-md-4').style.display = 'block';
+                    } else {
+                        card.closest('.col-md-4').style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

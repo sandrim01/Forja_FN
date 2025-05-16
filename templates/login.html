@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card">
+                <div class="card-header bg-navy text-center py-3">
+                    <h2 class="text-gold mb-0">Entrar</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('auth.login') }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {% if form.username.errors %}
+                                {{ form.username(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.username.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.username(class="form-control", placeholder="Seu nome de usuário") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            {{ form.password.label(class="form-label") }}
+                            {% if form.password.errors %}
+                                {{ form.password(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.password.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.password(class="form-control", placeholder="Sua senha") }}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            {{ form.remember(class="form-check-input") }}
+                            {{ form.remember.label(class="form-check-label") }}
+                        </div>
+                        
+                        <div class="d-grid">
+                            {{ form.submit(class="btn btn-gold btn-lg") }}
+                        </div>
+                        
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('auth.reset_request') }}" class="text-gold">Esqueceu sua senha?</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3">
+                    <p class="mb-0">Não tem uma conta? <a href="{{ url_for('auth.register') }}" class="text-gold">Registre-se</a></p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <div class="d-flex align-items-center justify-content-center mb-3">
+                    <img src="{{ url_for('static', filename='images/ranks/rank10.svg') }}" width="60" height="60" alt="Almirante" class="me-3">
+                    <div class="text-start">
+                        <h5 class="text-gold mb-1">Comece sua jornada</h5>
+                        <p class="text-muted mb-0">De Recruta a Almirante!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- User Profile Overview -->
+        <div class="col-lg-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-navy">
+                    <h5 class="text-gold mb-0">Perfil do Militar</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="rank-badge mb-3">
+                        <img id="rankImage" src="{{ current_user.get_rank_image() }}" alt="{{ current_user.get_rank_name() }}" width="100" height="100">
+                        <span id="rankName" class="rank-name">{{ current_user.get_rank_name() }}</span>
+                    </div>
+                    
+                    <h4>{{ current_user.first_name }} {{ current_user.last_name }}</h4>
+                    <p class="text-muted mb-3">@{{ current_user.username }}</p>
+                    
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="me-4 text-center">
+                            <h5 class="text-gold" id="userLevel">{{ current_user.level }}</h5>
+                            <small class="text-muted">Nível</small>
+                        </div>
+                        <div class="text-center">
+                            <h5 class="text-gold" id="userXP">{{ current_user.xp }}</h5>
+                            <small class="text-muted">XP</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label d-flex justify-content-between">
+                            <span>Próximo nível: {{ next_level_xp }} XP</span>
+                            <span>{{ current_user.xp }}/{{ next_level_xp }}</span>
+                        </label>
+                        <div class="xp-bar">
+                            <div class="xp-progress" style="width: {{ progress_percentage }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('main.profile') }}" class="btn btn-outline-gold">Editar Perfil</a>
+                </div>
+            </div>
+            
+            <!-- Latest Achievements -->
+            <div class="card mt-4">
+                <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+                    <h5 class="text-gold mb-0">Minhas Conquistas</h5>
+                    <a href="{{ url_for('main.achievements') }}" class="btn btn-sm btn-outline-gold">Ver Todas</a>
+                </div>
+                <div class="card-body">
+                    {% if achievements %}
+                        <div class="row text-center">
+                            {% for achievement in achievements[:6] %}
+                                <div class="col-4 mb-3">
+                                    <div class="achievement" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ achievement.description }}">
+                                        <img src="{{ achievement.badge_image }}" alt="{{ achievement.name }}">
+                                        <span class="achievement-name">{{ achievement.name }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <p class="text-muted">Complete desafios para ganhar conquistas!</p>
+                            <div class="achievement locked">
+                                <img src="{{ url_for('static', filename='images/badges/badge1.svg') }}" alt="Locked">
+                                <span class="achievement-name text-muted">???</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Dashboard Content -->
+        <div class="col-lg-8">
+            <!-- My Courses -->
+            <div class="card mb-4">
+                <div class="card-header bg-navy">
+                    <h5 class="text-gold mb-0">Meus Cursos</h5>
+                </div>
+                <div class="card-body">
+                    {% if enrolled_courses %}
+                        <div class="row">
+                            {% for course in enrolled_courses %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card course-card">
+                                        <div class="course-image" style="background-image: url('{% if course.thumbnail_url %}{{ course.thumbnail_url }}{% else %}https://pixabay.com/get/gc454b384a214c798c655461cbe38efd04b9054b8fe564b8ffcf4bc098233e30fa690f2517af97da2a7c66ceab7330fc18bc05d3f9fc5ec5d2fea029f59d4d663_1280.jpg{% endif %}')"></div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ course.title }}</h5>
+                                            <div class="progress mb-2" style="height: 8px;">
+                                                {% set lesson_count = course.lessons.count() %}
+                                                {% set progress = 30 %}  <!-- This would normally come from tracking user progress -->
+                                                <div class="progress-bar bg-gold" role="progressbar" style="width: {{ progress }}%" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <small class="text-muted">{{ progress }}% concluído</small>
+                                                <small class="text-muted">{{ lesson_count }} aulas</small>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <a href="{{ url_for('main.view_course', course_id=course.id) }}" class="btn btn-primary btn-sm">Continuar</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                            <h5>Você ainda não está matriculado em nenhum curso</h5>
+                            <p class="text-muted mb-3">Matricule-se em um curso para começar sua jornada de aprendizado.</p>
+                            <a href="{{ url_for('main.courses') }}" class="btn btn-gold">Ver Cursos Disponíveis</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Leaderboard -->
+            <div class="card mb-4">
+                <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+                    <h5 class="text-gold mb-0">Ranking</h5>
+                    <a href="{{ url_for('main.leaderboard') }}" class="btn btn-sm btn-outline-gold">Ver Completo</a>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush bg-transparent">
+                        {% for user in (User.query.order_by(User.xp.desc()).limit(5).all()) %}
+                            <li class="list-group-item bg-transparent">
+                                <div class="d-flex align-items-center">
+                                    <span class="leaderboard-rank {% if loop.index <= 3 %}top-3{% endif %}">{{ loop.index }}</span>
+                                    <img src="{{ user.get_rank_image() }}" alt="Patente" width="40" height="40" class="me-3">
+                                    <div class="leaderboard-info">
+                                        <span class="leaderboard-name">{{ user.username }}</span>
+                                        <span class="leaderboard-level">{{ user.get_rank_name() }}</span>
+                                    </div>
+                                    <span class="leaderboard-xp">{{ user.xp }} XP</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Recent Forum Activity -->
+            <div class="card">
+                <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+                    <h5 class="text-gold mb-0">Fórum - Discussões Recentes</h5>
+                    <a href="{{ url_for('forum.index') }}" class="btn btn-sm btn-outline-gold">Ver Fórum</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        {% if recent_posts %}
+                            {% for post in recent_posts %}
+                                <a href="{{ url_for('forum.view_topic', topic_id=post.id) }}" class="list-group-item list-group-item-action bg-transparent">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ post.title }}</h6>
+                                        <small class="text-muted relative-time" data-timestamp="{{ post.created_at }}">{{ post.created_at.strftime('%d/%m/%Y') }}</small>
+                                    </div>
+                                    <small class="text-muted">Por {{ post.author.username }} em {{ post.forum.name }}</small>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <p class="text-muted mb-0">Nenhuma discussão recente.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="text-gold">Fórum da Comunidade</h1>
+            <p class="text-muted">Compartilhe conhecimento, faça perguntas e interaja com outros fuzileiros navais.</p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-md-end">
+            <div class="input-group">
+                <input type="text" id="forumSearch" class="form-control" placeholder="Buscar tópicos...">
+                <button class="btn btn-gold" type="button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forum Statistics -->
+    <div class="card mb-4">
+        <div class="card-body bg-navy">
+            <div class="row text-center">
+                <div class="col-md-3 col-6 mb-3 mb-md-0">
+                    <h2 class="text-gold">{{ ForumPost.query.count() }}</h2>
+                    <p class="text-light mb-0">Tópicos</p>
+                </div>
+                <div class="col-md-3 col-6 mb-3 mb-md-0">
+                    <h2 class="text-gold">{{ ForumReply.query.count() }}</h2>
+                    <p class="text-light mb-0">Respostas</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <h2 class="text-gold">{{ User.query.count() }}</h2>
+                    <p class="text-light mb-0">Membros</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    {% set latest_post = ForumPost.query.order_by(ForumPost.created_at.desc()).first() %}
+                    <h2 class="text-gold">
+                        {% if latest_post %}
+                            {{ latest_post.created_at.strftime('%d/%m') }}
+                        {% else %}
+                            --/--
+                        {% endif %}
+                    </h2>
+                    <p class="text-light mb-0">Última Atividade</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Guidelines Card -->
+    <div class="alert alert-info mb-4">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="fas fa-info-circle fa-2x"></i>
+            </div>
+            <div>
+                <h5 class="text-gold">Diretrizes do Fórum</h5>
+                <p class="mb-0">Seja respeitoso com outros membros. Mantenha as discussões relevantes ao tema militar e educacional. Perguntas bem elaboradas e contribuições úteis rendem XP adicional!</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Forum Categories -->
+    {% if categories %}
+        {% for category in categories %}
+            <div class="card mb-4">
+                <div class="card-header bg-navy">
+                    <h5 class="text-gold mb-0">{{ category.name }}</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if category.forums %}
+                        <div class="table-responsive">
+                            <table class="table mb-0">
+                                <tbody>
+                                    {% for forum in category.forums %}
+                                        <tr>
+                                            <td style="width: 60px;" class="text-center">
+                                                <i class="fas fa-comments fa-2x text-gold"></i>
+                                            </td>
+                                            <td>
+                                                <h5 class="mb-1"><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}" class="text-decoration-none">{{ forum.name }}</a></h5>
+                                                <p class="text-muted mb-0">{{ forum.description }}</p>
+                                            </td>
+                                            <td class="forum-stats d-none d-md-table-cell text-center" style="width: 120px;">
+                                                <span class="stats-number">{{ forum.topics.count() }}</span>
+                                                <span class="stats-text">Tópicos</span>
+                                            </td>
+                                            <td class="forum-stats d-none d-md-table-cell text-center" style="width: 120px;">
+                                                {% set reply_count = 0 %}
+                                                {% for topic in forum.topics %}
+                                                    {% set reply_count = reply_count + topic.replies.count() %}
+                                                {% endfor %}
+                                                <span class="stats-number">{{ reply_count }}</span>
+                                                <span class="stats-text">Respostas</span>
+                                            </td>
+                                            <td class="d-none d-lg-table-cell" style="width: 250px;">
+                                                {% set latest_topic = forum.topics.order_by(ForumPost.created_at.desc()).first() %}
+                                                {% if latest_topic %}
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="{{ latest_topic.author.get_rank_image() }}" width="40" height="40" class="me-2" alt="Patente">
+                                                        <div>
+                                                            <a href="{{ url_for('forum.view_topic', topic_id=latest_topic.id) }}" class="text-gold text-decoration-none">{{ latest_topic.title|truncate(30) }}</a>
+                                                            <div class="small text-muted">
+                                                                <span>por {{ latest_topic.author.username }}</span>
+                                                                <span class="ms-2">{{ latest_topic.created_at.strftime('%d/%m/%Y') }}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {% else %}
+                                                    <span class="text-muted">Nenhum tópico ainda</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center">
+                            <p class="text-muted">Nenhum fórum encontrado nesta categoria.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                <h4>Nenhuma categoria encontrada</h4>
+                <p class="text-muted">O fórum ainda está sendo configurado.</p>
+            </div>
+        </div>
+    {% endif %}
+    
+    <!-- Online Users -->
+    <div class="card">
+        <div class="card-header bg-navy">
+            <h5 class="text-gold mb-0">Quem está online</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h6>Usuários online (15)</h6>
+                    <p class="mb-0">
+                        <a href="#" class="badge bg-navy me-1">Carlos_FN</a>
+                        <a href="#" class="badge bg-navy me-1">Mariana_Sgt</a>
+                        <a href="#" class="badge bg-navy me-1">Pedro123</a>
+                        <a href="#" class="badge bg-navy me-1">JoseGomes</a>
+                        <a href="#" class="badge bg-navy me-1">AnaSilva</a>
+                        <span class="badge bg-navy me-1">+10 mais</span>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Estatísticas</h6>
+                    <div class="d-flex">
+                        <div class="me-4">
+                            <i class="fas fa-users text-gold me-2"></i>
+                            <span>{{ User.query.count() }} membros</span>
+                        </div>
+                        <div>
+                            <i class="fas fa-user-plus text-gold me-2"></i>
+                            <span>Novo: {{ User.query.order_by(User.created_at.desc()).first().username if User.query.first() else 'Nenhum' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Forum search functionality
+        const searchInput = document.getElementById('forumSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const forumRows = document.querySelectorAll('table tbody tr');
+                
+                forumRows.forEach(row => {
+                    const forumName = row.querySelector('h5').textContent.toLowerCase();
+                    const forumDescription = row.querySelector('p').textContent.toLowerCase();
+                    
+                    if (forumName.includes(searchTerm) || forumDescription.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+</script>
+{% endblock %}

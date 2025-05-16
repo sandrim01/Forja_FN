@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <circle cx="50" cy="50" r="45" fill="#1A1A1A" stroke="#D4AF37" stroke-width="3"/>
+  <circle cx="50" cy="50" r="30" fill="#D4AF37"/>
+  <text x="50" y="45" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1A1A1A" text-anchor="middle">TOP</text>
+  <text x="50" y="60" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#1A1A1A" text-anchor="middle">1</text>
+</svg>

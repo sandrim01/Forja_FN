@@ -1,0 +1,221 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-lg-3 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <div class="rank-badge mb-3">
+                        <img src="{{ current_user.get_rank_image() }}" alt="{{ current_user.get_rank_name() }}" width="100" height="100">
+                        <span class="rank-name">{{ current_user.get_rank_name() }}</span>
+                    </div>
+                    
+                    <h4>{{ current_user.first_name }} {{ current_user.last_name }}</h4>
+                    <p class="text-muted mb-3">@{{ current_user.username }}</p>
+                    
+                    <div class="d-flex justify-content-center mb-3">
+                        <div class="me-4 text-center">
+                            <h5 class="text-gold">{{ current_user.level }}</h5>
+                            <small class="text-muted">Nível</small>
+                        </div>
+                        <div class="text-center">
+                            <h5 class="text-gold">{{ current_user.xp }}</h5>
+                            <small class="text-muted">XP</small>
+                        </div>
+                    </div>
+                    
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item bg-transparent">
+                            <i class="fas fa-envelope me-2 text-gold"></i> {{ current_user.email }}
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="fas fa-calendar-alt me-2 text-gold"></i> Membro desde {{ current_user.created_at.strftime('%d/%m/%Y') }}
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <i class="fas fa-users me-2 text-gold"></i> 
+                            {% for role in current_user.roles %}
+                                <span class="badge bg-navy">{{ role.name }}</span>
+                            {% endfor %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="list-group mt-4">
+                <a href="#profile" class="list-group-item list-group-item-action bg-navy text-light active" data-bs-toggle="list">
+                    <i class="fas fa-user-circle me-2"></i> Perfil
+                </a>
+                <a href="#payments" class="list-group-item list-group-item-action bg-transparent" data-bs-toggle="list">
+                    <i class="fas fa-credit-card me-2"></i> Pagamentos
+                </a>
+                <a href="#security" class="list-group-item list-group-item-action bg-transparent" data-bs-toggle="list">
+                    <i class="fas fa-shield-alt me-2"></i> Segurança
+                </a>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="col-lg-9">
+            <div class="tab-content">
+                <!-- Profile Tab -->
+                <div class="tab-pane fade show active" id="profile">
+                    <div class="card">
+                        <div class="card-header bg-navy">
+                            <h5 class="text-gold mb-0">Editar Perfil</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('main.profile') }}">
+                                {{ form.hidden_tag() }}
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        {{ form.first_name.label(class="form-label") }}
+                                        {% if form.first_name.errors %}
+                                            {{ form.first_name(class="form-control is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.first_name.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form.first_name(class="form-control") }}
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        {{ form.last_name.label(class="form-label") }}
+                                        {% if form.last_name.errors %}
+                                            {{ form.last_name(class="form-control is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form.last_name.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form.last_name(class="form-control") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    {{ form.email.label(class="form-label") }}
+                                    {% if form.email.errors %}
+                                        {{ form.email(class="form-control is-invalid") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.email.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.email(class="form-control") }}
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="d-grid">
+                                    {{ form.submit(class="btn btn-gold") }}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payments Tab -->
+                <div class="tab-pane fade" id="payments">
+                    <div class="card">
+                        <div class="card-header bg-navy">
+                            <h5 class="text-gold mb-0">Histórico de Pagamentos</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if payments %}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Curso</th>
+                                                <th>Valor</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for payment in payments %}
+                                                <tr>
+                                                    <td>{{ payment.created_at.strftime('%d/%m/%Y') }}</td>
+                                                    <td>{{ payment.course.title }}</td>
+                                                    <td>R$ {{ payment.amount }}</td>
+                                                    <td>
+                                                        {% if payment.status == 'completed' %}
+                                                            <span class="badge bg-success">Confirmado</span>
+                                                        {% elif payment.status == 'pending' %}
+                                                            <span class="badge bg-warning text-dark">Pendente</span>
+                                                        {% elif payment.status == 'failed' %}
+                                                            <span class="badge bg-danger">Falhou</span>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">{{ payment.status }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                                    <h5>Nenhum pagamento realizado</h5>
+                                    <p class="text-muted">Quando você adquirir um curso, as informações de pagamento aparecerão aqui.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Security Tab -->
+                <div class="tab-pane fade" id="security">
+                    <div class="card">
+                        <div class="card-header bg-navy">
+                            <h5 class="text-gold mb-0">Segurança da Conta</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-4">
+                                <h6 class="text-gold">Alterar Senha</h6>
+                                <p>Para alterar sua senha, você precisará confirmar sua identidade através de um link enviado ao seu email.</p>
+                                <a href="{{ url_for('auth.reset_request') }}" class="btn btn-outline-gold">Redefinir Senha</a>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div>
+                                <h6 class="text-gold">Sessões Ativas</h6>
+                                <p>Você está atualmente conectado neste dispositivo.</p>
+                                <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger">Sair de Todos os Dispositivos</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Activate Bootstrap tabs
+        document.querySelectorAll('.list-group-item[data-bs-toggle="list"]').forEach(function(el) {
+            el.addEventListener('click', function() {
+                document.querySelectorAll('.list-group-item').forEach(function(item) {
+                    item.classList.remove('active', 'bg-navy', 'text-light');
+                    item.classList.add('bg-transparent');
+                });
+                this.classList.add('active', 'bg-navy', 'text-light');
+                this.classList.remove('bg-transparent');
+            });
+        });
+    });
+</script>
+{% endblock %}

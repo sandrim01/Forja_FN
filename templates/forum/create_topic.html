@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}" class="text-gold">Fórum</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.category', category_id=forum.category.id) }}" class="text-gold">{{ forum.category.name }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}" class="text-gold">{{ forum.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Novo Tópico</li>
+        </ol>
+    </nav>
+    
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="text-gold">Criar Novo Tópico</h1>
+            <p class="text-muted">em {{ forum.name }}</p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-md-end">
+            <a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}" class="btn btn-outline-gold">
+                <i class="fas fa-arrow-left me-2"></i>Voltar para o Fórum
+            </a>
+        </div>
+    </div>
+    
+    <!-- Guidelines Card -->
+    <div class="alert alert-info mb-4">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="fas fa-lightbulb fa-2x"></i>
+            </div>
+            <div>
+                <h5 class="text-gold">Dicas para um bom tópico</h5>
+                <ul class="mb-0">
+                    <li>Escolha um título claro e específico.</li>
+                    <li>Descreva seu problema ou dúvida em detalhes.</li>
+                    <li>Se possível, inclua exemplos relevantes.</li>
+                    <li>Verifique se não existe um tópico similar antes de criar um novo.</li>
+                    <li>Respeite as normas da comunidade.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create Topic Form -->
+    <div class="card">
+        <div class="card-header bg-navy">
+            <h5 class="text-gold mb-0">Detalhes do Tópico</h5>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('forum.create_topic', forum_id=forum.id) }}">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.title.label(class="form-label") }}
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control", placeholder="Digite um título claro e conciso para seu tópico") }}
+                    {% endif %}
+                </div>
+                
+                <div class="mb-4">
+                    {{ form.content.label(class="form-label") }}
+                    {% if form.content.errors %}
+                        {{ form.content(class="form-control is-invalid", rows="10") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.content.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.content(class="form-control", rows="10", placeholder="Descreva sua dúvida ou tema para discussão em detalhes...") }}
+                    {% endif %}
+                    <small class="form-text text-muted">
+                        Dica: Você pode usar formatação HTML básica, como &lt;b&gt;negrito&lt;/b&gt;, &lt;i&gt;itálico&lt;/i&gt;, &lt;ul&gt; e &lt;li&gt; para listas, etc.
+                    </small>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('forum.view_forum', forum_id=forum.id) }}" class="btn btn-outline-secondary">Cancelar</a>
+                    {{ form.submit(class="btn btn-gold") }}
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Preview Section (optional, would be implemented with JavaScript in a real app) -->
+    <div class="card mt-4 d-none" id="previewSection">
+        <div class="card-header bg-navy">
+            <h5 class="text-gold mb-0">Pré-visualização</h5>
+        </div>
+        <div class="card-body">
+            <h4 id="previewTitle" class="text-gold mb-3"></h4>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Preview functionality (would be implemented in a real app)
+        // This is just a placeholder to show how it might work
+        const titleInput = document.querySelector('input[name="title"]');
+        const contentInput = document.querySelector('textarea[name="content"]');
+        const previewSection = document.getElementById('previewSection');
+        const previewTitle = document.getElementById('previewTitle');
+        const previewContent = document.getElementById('previewContent');
+        
+        if (titleInput && contentInput && previewSection && previewTitle && previewContent) {
+            // Add a preview button to the form
+            const form = document.querySelector('form');
+            const submitButton = form.querySelector('button[type="submit"]');
+            
+            const previewButton = document.createElement('button');
+            previewButton.type = 'button';
+            previewButton.className = 'btn btn-outline-gold me-2';
+            previewButton.innerHTML = '<i class="fas fa-eye me-2"></i>Pré-visualizar';
+            
+            submitButton.parentNode.insertBefore(previewButton, submitButton);
+            
+            // Add event listener to preview button
+            previewButton.addEventListener('click', function() {
+                if (titleInput.value.trim() === '' || contentInput.value.trim() === '') {
+                    alert('Por favor, preencha o título e o conteúdo para pré-visualizar.');
+                    return;
+                }
+                
+                previewTitle.textContent = titleInput.value;
+                // In a real app, you would sanitize HTML here
+                previewContent.innerHTML = contentInput.value;
+                previewSection.classList.remove('d-none');
+                
+                // Scroll to preview
+                previewSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+    });
+</script>
+{% endblock %}

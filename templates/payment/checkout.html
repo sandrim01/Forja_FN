@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header bg-navy">
+                    <h4 class="text-gold mb-0">Matrícula no Curso</h4>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="course-image me-3" style="width: 100px; height: 100px; background-image: url('{% if course.thumbnail_url %}{{ course.thumbnail_url }}{% else %}https://pixabay.com/get/g144e76ca8988062a978341e12b81b9b1d73fdc087356426a459abdb4bac6dc8ae2e7d71417036cd82d4d0df0b3ea6e83ed7b1c5c980fe1b6212d1a02a8c8661f_1280.jpg{% endif %}'); background-size: cover; background-position: center; border-radius: 8px;"></div>
+                        <div>
+                            <h5 class="mb-1">{{ course.title }}</h5>
+                            <p class="text-muted mb-0">Professor: {{ course.author.username }}</p>
+                            <div class="d-flex mt-1">
+                                <span class="badge bg-navy me-2">{{ course.lessons.count() }} aulas</span>
+                                <span class="badge bg-navy">{{ course.quizzes.count() }} quizzes</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <!-- Order Summary -->
+                    <div class="mb-4">
+                        <h5 class="text-gold mb-3">Resumo do Pedido</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Valor do curso</span>
+                            <span>R$ {{ course.price }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Desconto</span>
+                            <span>R$ 0.00</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <strong>Total</strong>
+                            <strong class="text-gold">R$ {{ course.price }}</strong>
+                        </div>
+                    </div>
+                    
+                    {% if not pix_data %}
+                        <!-- Payment Form -->
+                        <form method="POST" action="{{ url_for('payment.checkout', course_id=course.id) }}">
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="mb-4">
+                                <h5 class="text-gold mb-3">Método de Pagamento</h5>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="paymentMethod" id="pixPayment" checked>
+                                    <label class="form-check-label" for="pixPayment">
+                                        <i class="fas fa-qrcode me-2"></i>PIX (pagamento instantâneo)
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                                <label class="form-check-label" for="termsCheck">
+                                    Concordo com os <a href="#" class="text-gold">Termos de Serviço</a> e a <a href="#" class="text-gold">Política de Privacidade</a>.
+                                </label>
+                            </div>
+                            
+                            <div class="d-grid">
+                                {{ form.submit(class="btn btn-gold btn-lg") }}
+                            </div>
+                        </form>
+                    {% else %}
+                        <!-- PIX Payment Instructions -->
+                        <input type="hidden" id="paymentId" value="{{ payment.id }}">
+                        
+                        <div class="row" id="pixPayment">
+                            <div class="col-md-6 mb-4 mb-md-0">
+                                <div class="pix-container">
+                                    <h5 class="text-gold mb-3">Escaneie o QR Code PIX</h5>
+                                    <div class="qr-code-container bg-white p-3 mb-3">
+                                        <img src="data:image/png;base64,{{ pix_data.qr_code_base64 }}" alt="QR Code PIX" class="img-fluid">
+                                    </div>
+                                    <p class="mb-0">Abra o aplicativo do seu banco, escaneie o QR Code acima e confirme o pagamento.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h5 class="text-gold mb-3">Código PIX Copia e Cola</h5>
+                                    <div class="pix-copy-code" id="pixCode">{{ pix_data.qr_code }}</div>
+                                    <button class="btn btn-outline-gold w-100" id="copyPIXCode">
+                                        <i class="fas fa-copy me-2"></i>Copiar Código
+                                    </button>
+                                </div>
+                                
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Importante:</strong>
+                                    <ul class="mb-0 ps-3">
+                                        <li>Seu pagamento será processado instantaneamente.</li>
+                                        <li>Você terá acesso ao curso imediatamente após a confirmação.</li>
+                                        <li>O código PIX expira em 30 minutos.</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button class="btn btn-gold" onclick="completePayment()">
+                                        <i class="fas fa-check-circle me-2"></i>Já Realizei o Pagamento
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Secure Payment Notice -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-shield-alt fa-2x text-gold me-3"></i>
+                        <div>
+                            <h5 class="mb-1">Pagamento 100% Seguro</h5>
+                            <p class="mb-0 text-muted">Seus dados são protegidos por criptografia de ponta a ponta. Processamos pagamentos com toda segurança através da API do Mercado Pago.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/payment.js') }}"></script>
+{% endblock %}

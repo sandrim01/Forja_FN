@@ -1,0 +1,279 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.index') }}" class="text-gold">Fórum</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('forum.category', category_id=forum.category.id) }}" class="text-gold">{{ forum.category.name }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ forum.name }}</li>
+        </ol>
+    </nav>
+    
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="text-gold">{{ forum.name }}</h1>
+            <p class="text-muted">{{ forum.description }}</p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-md-end">
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('forum.create_topic', forum_id=forum.id) }}" class="btn btn-gold">
+                    <i class="fas fa-plus me-2"></i>Novo Tópico
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}" class="btn btn-outline-gold">
+                    <i class="fas fa-sign-in-alt me-2"></i>Entre para Participar
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Filter and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8 mb-3 mb-md-0">
+                    <div class="input-group">
+                        <input type="text" id="topicSearch" class="form-control" placeholder="Buscar tópicos...">
+                        <button class="btn btn-gold" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex justify-content-md-end">
+                    <select class="form-select" id="topicFilter">
+                        <option value="all">Todos os Tópicos</option>
+                        <option value="pinned">Fixados</option>
+                        <option value="open">Abertos</option>
+                        <option value="closed">Fechados</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Topics List -->
+    <div class="card mb-4">
+        <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+            <h5 class="text-gold mb-0">Tópicos</h5>
+            <span class="badge bg-navy">{{ posts.total }} tópicos</span>
+        </div>
+        <div class="card-body p-0">
+            {% if posts.items %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Tópico</th>
+                                <th class="d-none d-md-table-cell">Autor</th>
+                                <th class="text-center d-none d-md-table-cell">Respostas</th>
+                                <th class="text-center d-none d-md-table-cell">Visualizações</th>
+                                <th class="d-none d-lg-table-cell">Última Atualização</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in posts.items %}
+                                <tr class="{{ 'pinned-topic' if post.is_pinned }}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if post.is_pinned %}
+                                                <i class="fas fa-thumbtack text-gold me-2" data-bs-toggle="tooltip" title="Tópico Fixado"></i>
+                                            {% endif %}
+                                            {% if post.is_closed %}
+                                                <i class="fas fa-lock text-gold me-2" data-bs-toggle="tooltip" title="Tópico Fechado"></i>
+                                            {% endif %}
+                                            <div>
+                                                <h6 class="mb-0"><a href="{{ url_for('forum.view_topic', topic_id=post.id) }}" class="text-decoration-none">{{ post.title }}</a></h6>
+                                                <small class="d-block d-md-none text-muted">por {{ post.author.username }} - {{ post.created_at.strftime('%d/%m/%Y') }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="d-none d-md-table-cell">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ post.author.get_rank_image() }}" width="30" height="30" class="me-2" alt="Patente">
+                                            <div>
+                                                <span>{{ post.author.username }}</span>
+                                                <small class="d-block text-muted">{{ post.author.get_rank_name() }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center d-none d-md-table-cell">{{ post.replies.count() }}</td>
+                                    <td class="text-center d-none d-md-table-cell">{{ post.view_count }}</td>
+                                    <td class="d-none d-lg-table-cell">
+                                        {% set latest_reply = post.replies.order_by(ForumReply.created_at.desc()).first() %}
+                                        {% if latest_reply %}
+                                            <small>
+                                                <span class="relative-time" data-timestamp="{{ latest_reply.created_at }}">{{ latest_reply.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                                                <div>por {{ latest_reply.author.username }}</div>
+                                            </small>
+                                        {% else %}
+                                            <small>
+                                                <span class="relative-time" data-timestamp="{{ post.created_at }}">{{ post.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                                                <div>por {{ post.author.username }}</div>
+                                            </small>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-comments fa-4x text-muted mb-3"></i>
+                    <h4>Nenhum tópico encontrado</h4>
+                    <p class="text-muted mb-4">Seja o primeiro a criar um tópico neste fórum.</p>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('forum.create_topic', forum_id=forum.id) }}" class="btn btn-gold">
+                            <i class="fas fa-plus me-2"></i>Criar Novo Tópico
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-gold">
+                            <i class="fas fa-sign-in-alt me-2"></i>Entre para Participar
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        {% if posts.pages > 1 %}
+            <div class="card-footer">
+                <nav aria-label="Paginação de tópicos">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item {{ 'disabled' if posts.page == 1 else '' }}">
+                            <a class="page-link" href="{{ url_for('forum.view_forum', forum_id=forum.id, page=posts.prev_num) if posts.has_prev else '#' }}" tabindex="{{ '-1' if posts.page == 1 else '0' }}" aria-disabled="{{ 'true' if posts.page == 1 else 'false' }}">Anterior</a>
+                        </li>
+                        
+                        {% for page_num in range(1, posts.pages + 1) %}
+                            {% if page_num == posts.page %}
+                                <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                            {% else %}
+                                <li class="page-item"><a class="page-link" href="{{ url_for('forum.view_forum', forum_id=forum.id, page=page_num) }}">{{ page_num }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <li class="page-item {{ 'disabled' if posts.page == posts.pages else '' }}">
+                            <a class="page-link" href="{{ url_for('forum.view_forum', forum_id=forum.id, page=posts.next_num) if posts.has_next else '#' }}" aria-disabled="{{ 'true' if posts.page == posts.pages else 'false' }}">Próximo</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Forum Statistics -->
+    <div class="card">
+        <div class="card-header bg-navy">
+            <h5 class="text-gold mb-0">Estatísticas do Fórum</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h6>Usuários Ativos</h6>
+                    <p>
+                        {% set active_users = [] %}
+                        {% for post in posts.items %}
+                            {% if post.author.username not in active_users %}
+                                {% set active_users = active_users + [post.author.username] %}
+                            {% endif %}
+                            {% for reply in post.replies %}
+                                {% if reply.author.username not in active_users %}
+                                    {% set active_users = active_users + [reply.author.username] %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                        
+                        {% if active_users %}
+                            {% for username in active_users[:10] %}
+                                <a href="#" class="badge bg-navy me-1">{{ username }}</a>
+                            {% endfor %}
+                            {% if active_users|length > 10 %}
+                                <span class="badge bg-navy">+{{ active_users|length - 10 }} mais</span>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Nenhum usuário ativo recentemente</span>
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6>Informações</h6>
+                    <div class="d-flex flex-column flex-md-row">
+                        <div class="me-md-4 mb-2 mb-md-0">
+                            <i class="fas fa-file-alt text-gold me-2"></i>
+                            <span>{{ posts.total }} tópicos</span>
+                        </div>
+                        <div class="me-md-4 mb-2 mb-md-0">
+                            {% set reply_count = 0 %}
+                            {% for post in forum.topics %}
+                                {% set reply_count = reply_count + post.replies.count() %}
+                            {% endfor %}
+                            <i class="fas fa-reply text-gold me-2"></i>
+                            <span>{{ reply_count }} respostas</span>
+                        </div>
+                        <div>
+                            <i class="fas fa-eye text-gold me-2"></i>
+                            {% set view_count = 0 %}
+                            {% for post in forum.topics %}
+                                {% set view_count = view_count + post.view_count %}
+                            {% endfor %}
+                            <span>{{ view_count }} visualizações</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Topic search functionality
+        const searchInput = document.getElementById('topicSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const topicRows = document.querySelectorAll('tbody tr');
+                
+                topicRows.forEach(row => {
+                    const topicTitle = row.querySelector('h6').textContent.toLowerCase();
+                    const author = row.querySelector('td:nth-child(2)') ? 
+                                   row.querySelector('td:nth-child(2)').textContent.toLowerCase() : '';
+                    
+                    if (topicTitle.includes(searchTerm) || author.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Topic filter functionality
+        const filterSelect = document.getElementById('topicFilter');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', function() {
+                const filter = this.value;
+                const topicRows = document.querySelectorAll('tbody tr');
+                
+                topicRows.forEach(row => {
+                    if (filter === 'all') {
+                        row.style.display = '';
+                    } else if (filter === 'pinned') {
+                        row.style.display = row.classList.contains('pinned-topic') ? '' : 'none';
+                    } else if (filter === 'closed') {
+                        row.style.display = row.querySelector('.fa-lock') ? '' : 'none';
+                    } else if (filter === 'open') {
+                        row.style.display = !row.querySelector('.fa-lock') ? '' : 'none';
+                    }
+                });
+            });
+        }
+        
+        // Update relative time displays
+        updateTimestamps();
+    });
+</script>
+{% endblock %}

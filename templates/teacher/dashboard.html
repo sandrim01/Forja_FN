@@ -1,0 +1,225 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="text-gold">Painel do Professor</h1>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline-gold">
+                <i class="fas fa-home me-2"></i>Voltar para o Site
+            </a>
+        </div>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-book-open fa-3x text-gold mb-3"></i>
+                    <h2 class="text-gold">{{ courses|length }}</h2>
+                    <p class="text-muted mb-0">Meus Cursos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x text-gold mb-3"></i>
+                    {% set total_students = 0 %}
+                    {% for course in courses %}
+                        {% set total_students = total_students + course.students.count() %}
+                    {% endfor %}
+                    <h2 class="text-gold">{{ total_students }}</h2>
+                    <p class="text-muted mb-0">Alunos Totais</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-comments fa-3x text-gold mb-3"></i>
+                    <h2 class="text-gold">{{ ForumPost.query.filter(ForumPost.author==current_user).count() }}</h2>
+                    <p class="text-muted mb-0">Tópicos no Fórum</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-navy">
+                    <h5 class="text-gold mb-0">Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            <a href="{{ url_for('main.teacher_dashboard') }}" class="btn btn-outline-gold btn-lg w-100">
+                                <i class="fas fa-plus-circle fa-2x d-block mb-2 mt-2"></i>
+                                Criar Novo Curso
+                            </a>
+                        </div>
+                        <div class="col-md-4 text-center mb-3 mb-md-0">
+                            <a href="{{ url_for('main.teacher_dashboard') }}" class="btn btn-outline-gold btn-lg w-100">
+                                <i class="fas fa-upload fa-2x d-block mb-2 mt-2"></i>
+                                Enviar Material
+                            </a>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <a href="{{ url_for('forum.index') }}" class="btn btn-outline-gold btn-lg w-100">
+                                <i class="fas fa-question-circle fa-2x d-block mb-2 mt-2"></i>
+                                Responder Dúvidas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- My Courses -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+                    <h5 class="text-gold mb-0">Meus Cursos</h5>
+                    <a href="{{ url_for('main.teacher_dashboard') }}" class="btn btn-sm btn-outline-gold">Ver Todos</a>
+                </div>
+                <div class="card-body">
+                    {% if courses %}
+                        <div class="row">
+                            {% for course in courses %}
+                                <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100">
+                                        <div class="course-image" style="height: 140px; background-image: url('{% if course.thumbnail_url %}{{ course.thumbnail_url }}{% else %}https://pixabay.com/get/g144e76ca8988062a978341e12b81b9b1d73fdc087356426a459abdb4bac6dc8ae2e7d71417036cd82d4d0df0b3ea6e83ed7b1c5c980fe1b6212d1a02a8c8661f_1280.jpg{% endif %}'); background-size: cover; background-position: center;"></div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ course.title }}</h5>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="badge bg-navy">{{ course.lessons.count() }} aulas</span>
+                                                <span class="badge bg-gold text-dark">R$ {{ course.price }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-users me-2 text-gold"></i>
+                                                <span>{{ course.students.count() }} alunos matriculados</span>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="btn-group w-100">
+                                                <a href="{{ url_for('main.view_course', course_id=course.id) }}" class="btn btn-outline-gold">
+                                                    <i class="fas fa-eye me-1"></i> Visualizar
+                                                </a>
+                                                <a href="{{ url_for('main.teacher_dashboard') }}" class="btn btn-outline-primary">
+                                                    <i class="fas fa-edit me-1"></i> Editar
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-book fa-4x text-muted mb-3"></i>
+                            <h4>Você ainda não tem cursos</h4>
+                            <p class="text-muted mb-4">Comece criando seu primeiro curso para ajudar os alunos em sua jornada de aprendizado.</p>
+                            <a href="{{ url_for('main.teacher_dashboard') }}" class="btn btn-gold">
+                                <i class="fas fa-plus-circle me-2"></i>Criar Meu Primeiro Curso
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Student Activities -->
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-navy">
+                    <h5 class="text-gold mb-0">Atividade Recente dos Alunos</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-transparent">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='images/ranks/rank3.svg') }}" class="me-3" width="40" height="40" alt="Patente">
+                                <div>
+                                    <p class="mb-0"><strong>João Silva</strong> completou a aula <a href="#">Matemática Básica</a></p>
+                                    <small class="text-muted">Hoje, 10:45</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='images/ranks/rank4.svg') }}" class="me-3" width="40" height="40" alt="Patente">
+                                <div>
+                                    <p class="mb-0"><strong>Maria Santos</strong> tirou nota <span class="text-gold">90%</span> no quiz <a href="#">Fundamentos Navais</a></p>
+                                    <small class="text-muted">Ontem, 15:30</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='images/ranks/rank2.svg') }}" class="me-3" width="40" height="40" alt="Patente">
+                                <div>
+                                    <p class="mb-0"><strong>Carlos Oliveira</strong> se matriculou no curso <a href="#">Português para Concursos</a></p>
+                                    <small class="text-muted">23/05/2023, 09:15</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item bg-transparent">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ url_for('static', filename='images/ranks/rank5.svg') }}" class="me-3" width="40" height="40" alt="Patente">
+                                <div>
+                                    <p class="mb-0"><strong>Ana Pereira</strong> fez uma pergunta no fórum <a href="#">Estratégias de Prova</a></p>
+                                    <small class="text-muted">22/05/2023, 18:22</small>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Forum Questions -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-navy">
+                    <h5 class="text-gold mb-0">Perguntas Recentes no Fórum</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% set recent_posts = ForumPost.query.order_by(ForumPost.created_at.desc()).limit(4).all() %}
+                        {% if recent_posts %}
+                            {% for post in recent_posts %}
+                                <li class="list-group-item bg-transparent">
+                                    <div>
+                                        <h6 class="mb-1"><a href="{{ url_for('forum.view_topic', topic_id=post.id) }}">{{ post.title }}</a></h6>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small>Por <strong>{{ post.author.username }}</strong> em {{ post.forum.name }}</small>
+                                            <span class="badge bg-navy">{{ post.replies.count() }} respostas</span>
+                                        </div>
+                                        <small class="text-muted">{{ post.created_at.strftime('%d/%m/%Y, %H:%M') }}</small>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        {% else %}
+                            <li class="list-group-item bg-transparent text-center py-4">
+                                <p class="text-muted mb-0">Nenhuma pergunta recente no fórum.</p>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="card-footer text-center">
+                    <a href="{{ url_for('forum.index') }}" class="btn btn-outline-gold btn-sm">Ver Todas as Perguntas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

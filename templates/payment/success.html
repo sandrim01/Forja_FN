@@ -1,0 +1,114 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card text-center mb-4">
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <span class="d-inline-block text-success bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-check-circle fa-4x"></i>
+                        </span>
+                    </div>
+                    <h2 class="text-gold mb-3">Pagamento Confirmado!</h2>
+                    <p class="text-muted mb-4">Seu pagamento de <strong>R$ {{ payment.amount }}</strong> foi processado com sucesso.</p>
+                    
+                    <div class="alert alert-success mb-4">
+                        <i class="fas fa-medal me-2"></i>
+                        <span>Você recebeu <strong>50 XP</strong> por se matricular neste curso!</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center">
+                        <a href="{{ url_for('main.view_course', course_id=payment.course_id) }}" class="btn btn-gold btn-lg">
+                            <i class="fas fa-play-circle me-2"></i>Começar a Estudar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Confirmation Details -->
+            <div class="card">
+                <div class="card-header bg-navy">
+                    <h5 class="text-gold mb-0">Detalhes da Compra</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Informações do Pagamento</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td>ID do Pagamento:</td>
+                                    <td>{{ payment.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Data:</td>
+                                    <td>{{ payment.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Método:</td>
+                                    <td>PIX</td>
+                                </tr>
+                                <tr>
+                                    <td>Status:</td>
+                                    <td><span class="badge bg-success">Confirmado</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Resumo da Compra</h6>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td>Curso:</td>
+                                    <td>{{ payment.course.title }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Professor:</td>
+                                    <td>{{ payment.course.author.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Subtotal:</td>
+                                    <td>R$ {{ payment.amount }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total:</strong></td>
+                                    <td><strong class="text-gold">R$ {{ payment.amount }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <h5 class="text-gold mb-3">E agora?</h5>
+                        <div class="row">
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <i class="fas fa-book fa-2x text-gold mb-2"></i>
+                                <h6>Acesse o Curso</h6>
+                                <p class="small text-muted">Você já tem acesso completo ao curso e todo seu conteúdo.</p>
+                            </div>
+                            <div class="col-md-4 mb-3 mb-md-0">
+                                <i class="fas fa-laptop fa-2x text-gold mb-2"></i>
+                                <h6>Estude no seu Ritmo</h6>
+                                <p class="small text-muted">Acesse quando e onde quiser, sem limites de tempo.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <i class="fas fa-star fa-2x text-gold mb-2"></i>
+                                <h6>Ganhe XP e Suba de Nível</h6>
+                                <p class="small text-muted">Complete aulas e quizzes para progredir.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-4">
+                        <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-gold">
+                            <i class="fas fa-tachometer-alt me-2"></i>Ir para o Painel
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
