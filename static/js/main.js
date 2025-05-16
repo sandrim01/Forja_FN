@@ -22,10 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
 function checkXPLevel() {
     if (!document.querySelector('#levelUpContainer')) return;
     
-    fetch('/check_xp')
+    fetch('/api/check_xp')
         .then(response => response.json())
         .then(data => {
-            if (data.leveled_up) {
+            // Verificar se o usuário subiu de nível comparando XP atual com XP necessário para o próximo nível
+            const progressPercent = (data.xp / data.next_level_xp) * 100;
+            if (progressPercent >= 100) {
                 showLevelUpNotification(data.level, data.rank_name);
             }
         })
