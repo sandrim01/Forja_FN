@@ -59,13 +59,12 @@ def create_admin_user():
     """Create admin user if not exists"""
     admin = User.query.filter_by(username='admin').first()
     if not admin:
-        admin = User(
-            username='admin',
-            email='admin@forjafn.com',
-            first_name='Admin',
-            last_name='User',
-            is_active=True
-        )
+        admin = User()
+        admin.username = 'admin'
+        admin.email = 'admin@forjafn.com'
+        admin.first_name = 'Admin'
+        admin.last_name = 'User'
+        admin.is_active = True
         admin.set_password('admin123*')
         
         # Add admin role
