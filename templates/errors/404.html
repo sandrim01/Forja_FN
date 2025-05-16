@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="mb-4">
+                <i class="fas fa-map-signs fa-6x text-gold mb-4"></i>
+                <h1 class="text-gold">Página Não Encontrada</h1>
+                <p class="text-muted lead">Erro 404 - A página solicitada não existe</p>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-body py-5">
+                    <h2 class="text-gold mb-4">Localização Desconhecida</h2>
+                    <p>Parece que você está tentando acessar uma página que não existe em nossa plataforma.</p>
+                    <p>Isso pode acontecer porque:</p>
+                    <ul class="text-start mb-4" style="max-width: 400px; margin: 0 auto;">
+                        <li>A URL foi digitada incorretamente</li>
+                        <li>A página foi movida ou removida</li>
+                        <li>O link que você seguiu está quebrado</li>
+                    </ul>
+                    
+                    <div class="mt-5">
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('main.dashboard') }}" class="btn btn-gold me-2">
+                                <i class="fas fa-tachometer-alt me-2"></i>Ir para o Painel
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-gold me-2">
+                                <i class="fas fa-sign-in-alt me-2"></i>Fazer Login
+                            </a>
+                        {% endif %}
+                        <a href="{{ url_for('main.index') }}" class="btn btn-outline-gold">
+                            <i class="fas fa-home me-2"></i>Página Inicial
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Military-themed decoration -->
+            <div>
+                <img src="{{ url_for('static', filename='img/military-compass.svg') }}" alt="Bússola Militar" class="img-fluid rounded opacity-50" style="max-height: 150px;">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

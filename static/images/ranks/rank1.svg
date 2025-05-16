@@ -1,5 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <circle cx="50" cy="50" r="45" fill="#1A1A1A" stroke="#D4AF37" stroke-width="3"/>
-  <text x="50" y="44" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#E0E0E0" text-anchor="middle">RECRUTA</text>
-  <line x1="35" y1="55" x2="65" y2="55" stroke="#D4AF37" stroke-width="3" />
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200px" height="200px" viewBox="0 0 200 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Recruta</title>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <circle fill="#003366" cx="100" cy="100" r="95"></circle>
+        <path d="M100,20 C44.8,20 0,64.8 0,120 C0,175.2 44.8,220 100,220 C155.2,220 200,175.2 200,120 C200,64.8 155.2,20 100,20 Z M100,200 C55.8,200 20,164.2 20,120 C20,75.8 55.8,40 100,40 C144.2,40 180,75.8 180,120 C180,164.2 144.2,200 100,200 Z" fill="#D4AF37" fill-rule="nonzero"></path>
+        <circle fill="#D4AF37" cx="100" cy="100" r="15"></circle>
+    </g>
 </svg>

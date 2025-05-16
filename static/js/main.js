@@ -1,190 +1,118 @@
-/**
- * Forja FN - Main JavaScript File
- * Contains core functionality for the platform
- */
-
+// Inicialização do Bootstrap
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
+    // Inicialização de tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-
-    // Initialize popovers
-    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-    popoverTriggerList.map(function(popoverTriggerEl) {
+    
+    // Inicialização de popovers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl);
     });
-
-    // Flash message auto-close
-    const flashMessages = document.querySelectorAll('.alert-dismissible');
-    flashMessages.forEach(message => {
-        setTimeout(() => {
-            const alert = new bootstrap.Alert(message);
-            alert.close();
-        }, 5000);
-    });
-
-    // Level up notification
-    checkForLevelUp();
-
-    // Initialize mobile menu
-    setupMobileMenu();
-
-    // Update timestamp displays
-    updateTimestamps();
+    
+    // Verificação de nível a cada 10 segundos para usuários logados
+    if (document.querySelector('#levelUpContainer')) {
+        setInterval(checkXPLevel, 10000);
+    }
 });
 
-/**
- * Check if user has leveled up and display notification
- */
-function checkForLevelUp() {
-    const levelUpContainer = document.getElementById('levelUpContainer');
-    if (levelUpContainer && localStorage.getItem('leveledUp') === 'true') {
-        levelUpContainer.classList.remove('d-none');
-        localStorage.removeItem('leveledUp');
-
-        // Hide after 5 seconds
-        setTimeout(() => {
-            levelUpContainer.classList.add('fade-out');
-            setTimeout(() => {
-                levelUpContainer.classList.add('d-none');
-            }, 1000);
-        }, 5000);
-    }
-}
-
-/**
- * Update XP and check for level up
- * @param {number} xpGained - Amount of XP gained
- */
-function updateXP(xpGained) {
-    // Make AJAX request to update XP
-    fetch('/api/check_xp')
+// Função para verificar nível de XP
+function checkXPLevel() {
+    if (!document.querySelector('#levelUpContainer')) return;
+    
+    fetch('/check_xp')
         .then(response => response.json())
         .then(data => {
-            // Update XP display
-            const xpDisplay = document.getElementById('userXP');
-            if (xpDisplay) {
-                xpDisplay.textContent = data.xp;
-            }
-
-            // Update progress bar
-            const progressBar = document.querySelector('.xp-progress');
-            if (progressBar) {
-                const percentage = (data.xp / data.next_level_xp) * 100;
-                progressBar.style.width = `${Math.min(100, percentage)}%`;
-            }
-
-            // Update level display
-            const levelDisplay = document.getElementById('userLevel');
-            if (levelDisplay && levelDisplay.textContent != data.level) {
-                // Level up!
-                levelDisplay.textContent = data.level;
-                localStorage.setItem('leveledUp', 'true');
-                
-                // Update rank name and image
-                const rankNameElement = document.getElementById('rankName');
-                if (rankNameElement) {
-                    rankNameElement.textContent = data.rank_name;
-                }
-                
-                const rankImageElement = document.getElementById('rankImage');
-                if (rankImageElement) {
-                    rankImageElement.src = data.rank_image;
-                }
-                
-                // Reload page to show level up notification
-                window.location.reload();
+            if (data.leveled_up) {
+                showLevelUpNotification(data.level, data.rank_name);
             }
         })
-        .catch(error => console.error('Error updating XP:', error));
+        .catch(error => console.error('Erro ao verificar XP:', error));
 }
 
-/**
- * Initialize mobile menu behavior
- */
-function setupMobileMenu() {
-    const navbarToggler = document.querySelector('.navbar-toggler');
-    const navbarCollapse = document.querySelector('.navbar-collapse');
-
-    if (navbarToggler && navbarCollapse) {
-        document.addEventListener('click', (event) => {
-            const isClickInside = navbarToggler.contains(event.target) || navbarCollapse.contains(event.target);
-            
-            if (!isClickInside && navbarCollapse.classList.contains('show')) {
-                // Close the navbar if clicked outside
-                const bsCollapse = new bootstrap.Collapse(navbarCollapse);
-                bsCollapse.hide();
-            }
-        });
-    }
-}
-
-/**
- * Format relative timestamps
- */
-function updateTimestamps() {
-    const timestamps = document.querySelectorAll('.relative-time');
+// Mostrar notificação de nível alcançado
+function showLevelUpNotification(level, rankName) {
+    const container = document.querySelector('#levelUpContainer');
+    if (!container) return;
     
-    timestamps.forEach(element => {
-        const timestamp = new Date(element.getAttribute('data-timestamp'));
-        const now = new Date();
-        const diffInSeconds = Math.floor((now - timestamp) / 1000);
-        
-        let formattedTime;
-        
-        if (diffInSeconds < 60) {
-            formattedTime = 'agora mesmo';
-        } else if (diffInSeconds < 3600) {
-            const minutes = Math.floor(diffInSeconds / 60);
-            formattedTime = `${minutes} minuto${minutes > 1 ? 's' : ''} atrás`;
-        } else if (diffInSeconds < 86400) {
-            const hours = Math.floor(diffInSeconds / 3600);
-            formattedTime = `${hours} hora${hours > 1 ? 's' : ''} atrás`;
-        } else if (diffInSeconds < 2592000) { // 30 days
-            const days = Math.floor(diffInSeconds / 86400);
-            formattedTime = `${days} dia${days > 1 ? 's' : ''} atrás`;
-        } else if (diffInSeconds < 31536000) { // 1 year
-            const months = Math.floor(diffInSeconds / 2592000);
-            formattedTime = `${months} mês${months > 1 ? 'es' : ''} atrás`;
+    // Atualizar informações
+    container.querySelector('p:nth-of-type(1) span').textContent = level;
+    container.querySelector('p:nth-of-type(2) span').textContent = rankName;
+    
+    // Exibir a notificação
+    container.classList.remove('d-none');
+    container.classList.add('animate-pulse');
+    
+    // Reproduzir som de congratulação (se disponível)
+    const audio = new Audio('/static/sounds/level-up.mp3');
+    audio.play().catch(e => console.log('Reprodução de áudio não suportada'));
+    
+    // Ocultar após 5 segundos
+    setTimeout(() => {
+        container.classList.add('d-none');
+        container.classList.remove('animate-pulse');
+    }, 5000);
+}
+
+// Função para inicializar o temporizador do quiz
+function initQuizTimer(timeLimit) {
+    const timerElement = document.getElementById('quizTimer');
+    if (!timerElement) return;
+    
+    let minutes = timeLimit;
+    let seconds = 0;
+    
+    const interval = setInterval(() => {
+        if (seconds === 0) {
+            if (minutes === 0) {
+                clearInterval(interval);
+                document.getElementById('quizForm').submit();
+                return;
+            }
+            minutes--;
+            seconds = 59;
         } else {
-            const years = Math.floor(diffInSeconds / 31536000);
-            formattedTime = `${years} ano${years > 1 ? 's' : ''} atrás`;
+            seconds--;
         }
         
-        element.textContent = formattedTime;
-    });
-}
-
-/**
- * Copy text to clipboard
- * @param {string} text - Text to copy
- * @param {string} buttonId - ID of button to update
- */
-function copyToClipboard(text, buttonId) {
-    navigator.clipboard.writeText(text).then(() => {
-        // Update button text
-        const button = document.getElementById(buttonId);
-        const originalText = button.textContent;
-        button.textContent = 'Copiado!';
+        // Formatar tempo (MM:SS)
+        const formattedMinutes = minutes.toString().padStart(2, '0');
+        const formattedSeconds = seconds.toString().padStart(2, '0');
+        timerElement.textContent = `${formattedMinutes}:${formattedSeconds}`;
         
-        // Reset button text after 2 seconds
-        setTimeout(() => {
-            button.textContent = originalText;
-        }, 2000);
-    }).catch(err => {
-        console.error('Failed to copy text: ', err);
-    });
+        // Aviso de tempo acabando
+        if (minutes === 0 && seconds <= 30) {
+            timerElement.classList.add('text-danger');
+            timerElement.classList.add('animate-pulse');
+        }
+    }, 1000);
 }
 
-/**
- * Show confirmation dialog
- * @param {string} message - Confirmation message
- * @param {function} callback - Function to call if confirmed
- */
-function confirmAction(message, callback) {
-    if (window.confirm(message)) {
-        callback();
+// Seleção de opção de resposta no quiz
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('answer-option') || e.target.closest('.answer-option')) {
+        const option = e.target.classList.contains('answer-option') ? e.target : e.target.closest('.answer-option');
+        const questionId = option.dataset.questionId;
+        const radioInput = option.querySelector('input[type="radio"]');
+        
+        // Deselecionar outras opções do mesmo grupo
+        document.querySelectorAll(`.answer-option[data-question-id="${questionId}"]`).forEach(el => {
+            el.classList.remove('selected');
+        });
+        
+        // Selecionar opção atual
+        option.classList.add('selected');
+        radioInput.checked = true;
     }
-}
+});
+
+// Confirmação para ações destrutivas
+document.addEventListener('click', function(e) {
+    if (e.target.hasAttribute('data-confirm')) {
+        if (!confirm(e.target.getAttribute('data-confirm'))) {
+            e.preventDefault();
+        }
+    }
+});
