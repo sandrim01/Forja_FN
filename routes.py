@@ -188,6 +188,9 @@ def achievements():
 @login_required
 @requires_roles('admin')
 def admin_dashboard():
+    if not current_user.is_admin():
+        abort(403)
+        
     # Count users
     total_users = User.query.count()
     total_courses = Course.query.count()
