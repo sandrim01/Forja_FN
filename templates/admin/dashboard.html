@@ -1,106 +1,111 @@
+
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <h1 class="text-gold">Painel Administrativo</h1>
-        </div>
-        <div class="col-md-6 text-md-end">
-            <a href="{{ url_for('main.index') }}" class="btn btn-outline-gold">
-                <i class="fas fa-home me-2"></i>Voltar para o Site
-            </a>
+<div class="container-fluid py-4">
+    <div class="admin-header mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="text-gold mb-0">Painel Administrativo</h1>
+                <p class="text-light mb-0">Bem-vindo, {{ current_user.username }}</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="{{ url_for('main.index') }}" class="btn btn-outline-gold">
+                    <i class="fas fa-home me-2"></i>Voltar para o Site
+                </a>
+            </div>
         </div>
     </div>
     
     <!-- Stats Overview -->
-    <div class="row mb-5">
-        <div class="col-md-3 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-users fa-3x text-gold mb-3"></i>
-                    <h2 class="text-gold">{{ total_users }}</h2>
-                    <p class="text-muted mb-0">Alunos Registrados</p>
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="admin-stats">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gold"></i>
+                    </div>
+                    <div class="col">
+                        <div class="text-gold h2 mb-0">{{ total_users }}</div>
+                        <div class="text-light">Alunos Ativos</div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-book-open fa-3x text-gold mb-3"></i>
-                    <h2 class="text-gold">{{ total_courses }}</h2>
-                    <p class="text-muted mb-0">Cursos Ativos</p>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="admin-stats">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <i class="fas fa-graduation-cap fa-2x text-gold"></i>
+                    </div>
+                    <div class="col">
+                        <div class="text-gold h2 mb-0">{{ total_courses }}</div>
+                        <div class="text-light">Cursos</div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-credit-card fa-3x text-gold mb-3"></i>
-                    <h2 class="text-gold">{{ total_payments }}</h2>
-                    <p class="text-muted mb-0">Pagamentos</p>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="admin-stats">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <i class="fas fa-money-bill fa-2x text-gold"></i>
+                    </div>
+                    <div class="col">
+                        <div class="text-gold h2 mb-0">{{ total_payments }}</div>
+                        <div class="text-light">Pagamentos</div>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 mb-4">
-            <div class="card">
-                <div class="card-body text-center">
-                    <i class="fas fa-comments fa-3x text-gold mb-3"></i>
-                    <h2 class="text-gold">{{ ForumPost.query.count() }}</h2>
-                    <p class="text-muted mb-0">Tópicos no Fórum</p>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Admin Navigation Tiles -->
-    <div class="row mb-5">
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body text-center py-4">
-                    <i class="fas fa-user-shield fa-4x text-gold mb-3"></i>
-                    <h4 class="text-gold">Gerenciar Usuários</h4>
-                    <p>Administrar contas, papéis e permissões.</p>
-                    <a href="{{ url_for('main.admin_users') }}" class="btn btn-outline-gold">
-                        <i class="fas fa-users me-2"></i>Ver Usuários
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body text-center py-4">
-                    <i class="fas fa-graduation-cap fa-4x text-gold mb-3"></i>
-                    <h4 class="text-gold">Gerenciar Cursos</h4>
-                    <p>Adicionar, editar e remover cursos.</p>
-                    <a href="{{ url_for('main.admin_courses') }}" class="btn btn-outline-gold">
-                        <i class="fas fa-book-open me-2"></i>Ver Cursos
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body text-center py-4">
-                    <i class="fas fa-chart-bar fa-4x text-gold mb-3"></i>
-                    <h4 class="text-gold">Relatórios</h4>
-                    <p>Visualizar estatísticas e gerar relatórios.</p>
-                    <button class="btn btn-outline-gold" disabled>
-                        <i class="fas fa-chart-line me-2"></i>Em Breve
-                    </button>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="admin-stats">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gold"></i>
+                    </div>
+                    <div class="col">
+                        <div class="text-gold h2 mb-0">{{ ForumPost.query.count() }}</div>
+                        <div class="text-light">Tópicos</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Recent Activity -->
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="admin-card p-3">
+                <h5 class="text-gold mb-3">Ações Rápidas</h5>
+                <div class="row g-2">
+                    <div class="col-auto">
+                        <a href="{{ url_for('main.admin_users') }}" class="btn btn-gold">
+                            <i class="fas fa-user-plus me-2"></i>Novo Usuário
+                        </a>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{{ url_for('main.admin_courses') }}" class="btn btn-gold">
+                            <i class="fas fa-plus-circle me-2"></i>Novo Curso
+                        </a>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-gold" onclick="generateReport()">
+                            <i class="fas fa-file-export me-2"></i>Gerar Relatório
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
     <div class="row">
         <!-- Recent Users -->
-        <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+        <div class="col-xl-6 mb-4">
+            <div class="admin-card h-100">
+                <div class="card-header bg-navy">
                     <h5 class="text-gold mb-0">Usuários Recentes</h5>
-                    <a href="{{ url_for('main.admin_users') }}" class="btn btn-sm btn-outline-gold">Ver Todos</a>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -109,42 +114,46 @@
                                 <tr>
                                     <th>Usuário</th>
                                     <th>Email</th>
-                                    <th>Papel</th>
-                                    <th>Data</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% if recent_users %}
-                                    {% for user in recent_users %}
-                                        <tr>
-                                            <td>{{ user.username }}</td>
-                                            <td>{{ user.email }}</td>
-                                            <td>
-                                                {% for role in user.roles %}
-                                                    <span class="badge bg-navy">{{ role.name }}</span>
-                                                {% endfor %}
-                                            </td>
-                                            <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="4" class="text-center">Nenhum usuário encontrado.</td>
-                                    </tr>
-                                {% endif %}
+                                {% for user in recent_users %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        {% if user.is_active %}
+                                        <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-gold">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <!-- Recent Payments -->
-        <div class="col-lg-6 mb-4">
-            <div class="card">
-                <div class="card-header bg-navy d-flex justify-content-between align-items-center">
+        <div class="col-xl-6 mb-4">
+            <div class="admin-card h-100">
+                <div class="card-header bg-navy">
                     <h5 class="text-gold mb-0">Pagamentos Recentes</h5>
-                    <button class="btn btn-sm btn-outline-gold" disabled>Ver Todos</button>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -153,36 +162,27 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Usuário</th>
-                                    <th>Curso</th>
                                     <th>Valor</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% set payments = Payment.query.order_by(Payment.created_at.desc()).limit(5).all() %}
-                                {% if payments %}
-                                    {% for payment in payments %}
-                                        <tr>
-                                            <td>{{ payment.id }}</td>
-                                            <td>{{ payment.user.username }}</td>
-                                            <td>{{ payment.course.title }}</td>
-                                            <td>R$ {{ payment.amount }}</td>
-                                            <td>
-                                                {% if payment.status == 'completed' %}
-                                                    <span class="badge bg-success">Completo</span>
-                                                {% elif payment.status == 'pending' %}
-                                                    <span class="badge bg-warning text-dark">Pendente</span>
-                                                {% else %}
-                                                    <span class="badge bg-danger">{{ payment.status }}</span>
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="5" class="text-center">Nenhum pagamento encontrado.</td>
-                                    </tr>
-                                {% endif %}
+                                {% for payment in Payment.query.order_by(Payment.created_at.desc()).limit(5).all() %}
+                                <tr>
+                                    <td>#{{ payment.id }}</td>
+                                    <td>{{ payment.user.username }}</td>
+                                    <td>R$ {{ "%.2f"|format(payment.amount) }}</td>
+                                    <td>
+                                        {% if payment.status == 'completed' %}
+                                        <span class="badge bg-success">Concluído</span>
+                                        {% elif payment.status == 'pending' %}
+                                        <span class="badge bg-warning">Pendente</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">{{ payment.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -191,4 +191,12 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+function generateReport() {
+    alert('Funcionalidade de relatório será implementada em breve!');
+}
+</script>
+{% endblock %}
 {% endblock %}
