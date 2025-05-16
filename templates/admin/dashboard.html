@@ -1,116 +1,100 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container-fluid py-4">
-    <div class="admin-header mb-4">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <h1 class="text-gold mb-0">Painel Administrativo</h1>
-                <p class="text-light mb-0">Administrador: {{ current_user.username }}</p>
-            </div>
-            <div class="col-md-6 text-md-end">
-                <div class="btn-group">
-                    <a href="{{ url_for('main.admin_users') }}" class="btn btn-outline-gold">
-                        <i class="fas fa-users me-2"></i>Usuários
-                    </a>
-                    <a href="{{ url_for('main.admin_courses') }}" class="btn btn-outline-gold">
-                        <i class="fas fa-graduation-cap me-2"></i>Cursos
-                    </a>
-                    <a href="#" class="btn btn-outline-gold">
-                        <i class="fas fa-chart-line me-2"></i>Relatórios
-                    </a>
+<div class="container py-4">
+    <div class="row g-4">
+        <!-- Stats Cards -->
+        <div class="col-md-3">
+            <div class="card bg-navy h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-users fa-3x text-gold mb-3"></i>
+                    <h3 class="text-gold">{{ total_users }}</h3>
+                    <p class="text-light mb-0">Alunos</p>
                 </div>
             </div>
         </div>
-    </div>
+        <div class="col-md-3">
+            <div class="card bg-navy h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-graduation-cap fa-3x text-gold mb-3"></i>
+                    <h3 class="text-gold">{{ total_courses }}</h3>
+                    <p class="text-light mb-0">Cursos</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-navy h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-money-bill fa-3x text-gold mb-3"></i>
+                    <h3 class="text-gold">R$ {{ "{:,.2f}".format(total_revenue) }}</h3>
+                    <p class="text-light mb-0">Receita Total</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-navy h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x text-gold mb-3"></i>
+                    <h3 class="text-gold">{{ total_payments }}</h3>
+                    <p class="text-light mb-0">Vendas</p>
+                </div>
+            </div>
+        </div>
 
-    <!-- Stats Overview -->
-    <div class="row mb-4">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="admin-stats">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-users fa-2x text-gold"></i>
-                    </div>
-                    <div class="col">
-                        <div class="text-gold h2 mb-0">{{ total_users }}</div>
-                        <div class="text-light">Usuários Ativos</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="admin-stats">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-graduation-cap fa-2x text-gold"></i>
-                    </div>
-                    <div class="col">
-                        <div class="text-gold h2 mb-0">{{ total_courses }}</div>
-                        <div class="text-light">Cursos Ativos</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="admin-stats">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-money-bill fa-2x text-gold"></i>
-                    </div>
-                    <div class="col">
-                        <div class="text-gold h2 mb-0">R$ {{ "%.2f"|format(total_revenue) }}</div>
-                        <div class="text-light">Receita Total</div>
+        <!-- Quick Actions -->
+        <div class="col-12">
+            <div class="card bg-navy">
+                <div class="card-body">
+                    <h5 class="text-gold mb-4">Ações Rápidas</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{{ url_for('main.admin_users') }}" class="btn btn-gold w-100 p-3">
+                                <i class="fas fa-user-plus me-2"></i>Gerenciar Alunos
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('main.admin_courses') }}" class="btn btn-gold w-100 p-3">
+                                <i class="fas fa-plus-circle me-2"></i>Criar Curso
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-gold w-100 p-3">
+                                <i class="fas fa-chart-bar me-2"></i>Relatórios
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="#" class="btn btn-outline-gold w-100 p-3">
+                                <i class="fas fa-cog me-2"></i>Configurações
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="admin-stats">
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <i class="fas fa-comments fa-2x text-gold"></i>
-                    </div>
-                    <div class="col">
-                        <div class="text-gold h2 mb-0">{{ total_forum_posts }}</div>
-                        <div class="text-light">Posts no Fórum</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="row">
         <!-- Recent Users -->
-        <div class="col-xl-6 mb-4">
-            <div class="admin-card h-100">
+        <div class="col-md-6">
+            <div class="card">
                 <div class="card-header bg-navy">
-                    <h5 class="text-gold mb-0">Usuários Recentes</h5>
+                    <h5 class="text-gold mb-0">Alunos Recentes</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>Usuário</th>
+                                    <th>Nome</th>
                                     <th>Email</th>
-                                    <th>Status</th>
+                                    <th>Data</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for user in recent_users %}
                                 <tr>
-                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
                                     <td>{{ user.email }}</td>
-                                    <td>
-                                        {% if user.is_active %}
-                                        <span class="badge bg-success">Ativo</span>
-                                        {% else %}
-                                        <span class="badge bg-danger">Inativo</span>
-                                        {% endif %}
-                                    </td>
+                                    <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
                                     <td>
                                         <div class="btn-group btn-group-sm">
                                             <button class="btn btn-outline-gold">
@@ -131,18 +115,18 @@
         </div>
 
         <!-- Recent Payments -->
-        <div class="col-xl-6 mb-4">
-            <div class="admin-card h-100">
+        <div class="col-md-6">
+            <div class="card">
                 <div class="card-header bg-navy">
                     <h5 class="text-gold mb-0">Pagamentos Recentes</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover">
+                        <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Usuário</th>
+                                    <th>Aluno</th>
+                                    <th>Curso</th>
                                     <th>Valor</th>
                                     <th>Status</th>
                                 </tr>
@@ -150,17 +134,11 @@
                             <tbody>
                                 {% for payment in recent_payments %}
                                 <tr>
-                                    <td>#{{ payment.id }}</td>
                                     <td>{{ payment.user.username }}</td>
+                                    <td>{{ payment.course.title }}</td>
                                     <td>R$ {{ "%.2f"|format(payment.amount) }}</td>
                                     <td>
-                                        {% if payment.status == 'completed' %}
-                                        <span class="badge bg-success">Concluído</span>
-                                        {% elif payment.status == 'pending' %}
-                                        <span class="badge bg-warning">Pendente</span>
-                                        {% else %}
-                                        <span class="badge bg-danger">{{ payment.status }}</span>
-                                        {% endif %}
+                                        <span class="badge bg-success">{{ payment.status }}</span>
                                     </td>
                                 </tr>
                                 {% endfor %}
