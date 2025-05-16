@@ -19,7 +19,7 @@
 <body>
     <!-- Level Up Notification (Hidden by default) -->
     <div id="levelUpContainer" class="position-fixed top-50 start-50 translate-middle text-center p-4 bg-navy border border-gold rounded d-none" style="z-index: 1050;">
-        <img src="{{ url_for('static', filename='images/ranks/rank' + (current_user.level if current_user.is_authenticated else '1') + '.svg') }}" width="100" height="100" alt="Novo nível">
+        <img src="{{ url_for('static', filename='images/ranks/rank' + (current_user.level|string if current_user.is_authenticated else '1') + '.svg') }}" width="100" height="100" alt="Novo nível">
         <h3 class="text-gold mt-3">Parabéns!</h3>
         <p class="text-light">Você alcançou o nível <span class="text-gold">{{ current_user.level if current_user.is_authenticated else '1' }}</span></p>
         <p class="text-light">Novo posto: <span class="text-gold">{{ current_user.get_rank_name() if current_user.is_authenticated else 'Recruta' }}</span></p>
