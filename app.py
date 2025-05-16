@@ -90,7 +90,7 @@ def create_app():
     from forum import forum_bp
     from payment import payment_bp
     
-    app.register_blueprint(auth_bp)
+    app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(main_bp)
     app.register_blueprint(forum_bp, url_prefix='/forum')
     app.register_blueprint(payment_bp, url_prefix='/payment')
