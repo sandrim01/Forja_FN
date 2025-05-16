@@ -191,6 +191,7 @@ def admin_dashboard():
     # Count users
     total_users = User.query.count()
     total_courses = Course.query.count()
+    total_forum_posts = ForumPost.query.count()
     
     # Count payments
     total_payments = Payment.query.filter_by(status='completed').count()
@@ -203,7 +204,9 @@ def admin_dashboard():
                           total_users=total_users,
                           total_courses=total_courses,
                           total_payments=total_payments,
-                          recent_users=recent_users)
+                          total_forum_posts=total_forum_posts,
+                          recent_users=recent_users,
+                          ForumPost=ForumPost)
 
 @main_bp.route('/admin/users')
 @login_required
