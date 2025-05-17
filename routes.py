@@ -203,16 +203,16 @@ def admin_dashboard():
     total_payments = len(completed_payments)
     total_revenue = sum(payment.amount for payment in completed_payments)
     
+    # Get pending registrations
+    pending_registrations = User.query.filter_by(registration_status='pending').order_by(desc(User.created_at)).all()
+    
     # Recent users and payments
     recent_users = User.query.order_by(desc(User.created_at)).limit(10).all()
     recent_payments = Payment.query.order_by(desc(Payment.created_at)).limit(5).all()
     
-    # Get pending registrations
-    pending_registrations = User.query.filter_by(registration_status='pending').order_by(desc(User.created_at)).all()
-    
     return render_template('admin/dashboard.html',
-                          title='Painel Administrativo',
                           pending_registrations=pending_registrations,
+                          title='Painel Administrativo',
                           total_users=total_users,
                           total_courses=total_courses,
                           total_payments=total_payments,
@@ -264,8 +264,7 @@ def approve_registration(user_id):
     user.registration_status = 'approved'
     user.is_active = True
     db.session.commit()
-    flash('Registro aprovado com sucesso!', 'success')
-    return redirect(url_for('main.admin_dashboard'))
+    return jsonify({'success': True})
 
 @main_bp.route('/admin/registrations/<int:user_id>/reject', methods=['POST'])
 @login_required
@@ -275,8 +274,7 @@ def reject_registration(user_id):
     user.registration_status = 'rejected'
     user.is_active = False
     db.session.commit()
-    flash('Registro rejeitado com sucesso!', 'success')
-    return redirect(url_for('main.admin_dashboard'))
+    return jsonify({'success': True})
 
 @main_bp.route('/admin/courses')
 @login_required
