@@ -290,6 +290,32 @@ class Payment(db.Model):
     def __repr__(self):
         return f'<Payment {self.id}>'
 
+class Mission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    content = db.Column(db.Text)  # Study material
+    order = db.Column(db.Integer, default=0)
+    xp_reward = db.Column(db.Integer, default=50)
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    
+    # Relationships
+    questions = db.relationship('MissionQuestion', backref='mission', lazy='dynamic', cascade='all, delete-orphan')
+    
+    def __repr__(self):
+        return f'<Mission {self.title}>'
+
+class MissionQuestion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    question_text = db.Column(db.Text, nullable=False)
+    choices = db.Column(db.Text)  # JSON string of choices
+    correct_answer = db.Column(db.String(255), nullable=False)
+    explanation = db.Column(db.Text)
+    mission_id = db.Column(db.Integer, db.ForeignKey('mission.id'))
+    
+    def __repr__(self):
+        return f'<MissionQuestion {self.id}>'
+
 class Achievement(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)

@@ -1,0 +1,40 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header bg-navy">
+                    <h4 class="text-gold mb-0">Questionário: {{ mission.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% for question in mission.questions %}
+                            <div class="mb-4">
+                                <h5>{{ loop.index }}. {{ question.question_text }}</h5>
+                                {% for choice in question.choices|json_loads %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" 
+                                               name="question_{{ question.id }}" 
+                                               value="{{ choice }}" required>
+                                        <label class="form-check-label">{{ choice }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-gold btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Enviar Respostas
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

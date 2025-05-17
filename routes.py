@@ -101,6 +101,43 @@ def view_course(course_id):
                           is_enrolled=is_enrolled,
                           can_access=can_access)
 
+@main_bp.route('/courses/<int:course_id>/missions')
+@login_required
+def course_missions(course_id):
+    course = Course.query.get_or_404(course_id)
+    missions = Mission.query.filter_by(course_id=course_id).order_by(Mission.order).all()
+    return render_template('courses/missions.html', course=course, missions=missions)
+
+@main_bp.route('/courses/<int:course_id>/mission/<int:mission_id>')
+@login_required
+def view_mission(course_id, mission_id):
+    course = Course.query.get_or_404(course_id)
+    mission = Mission.query.get_or_404(mission_id)
+    return render_template('courses/mission.html', course=course, mission=mission)
+
+@main_bp.route('/courses/<int:course_id>/mission/<int:mission_id>/quiz', methods=['GET', 'POST'])
+@login_required
+def mission_quiz(course_id, mission_id):
+    mission = Mission.query.get_or_404(mission_id)
+    if request.method == 'POST':
+        score = 0
+        total = mission.questions.count()
+        for question in mission.questions:
+            answer = request.form.get(f'question_{question.id}')
+            if answer == question.correct_answer:
+                score += 1
+        
+        percentage = (score / total * 100) if total > 0 else 0
+        if percentage >= 70:  # Passing score
+            current_user.add_xp(mission.xp_reward)
+            db.session.commit()
+            flash('Parabéns! Você completou a missão!', 'success')
+        return render_template('courses/mission_results.html', 
+                             mission=mission, score=score, 
+                             total=total, percentage=percentage)
+    
+    return render_template('courses/mission_quiz.html', mission=mission)
+
 @main_bp.route('/courses/<int:course_id>/lesson/<int:lesson_id>')
 @login_required
 def view_lesson(course_id, lesson_id):

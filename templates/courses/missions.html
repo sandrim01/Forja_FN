@@ -1,0 +1,41 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header bg-navy">
+                    <h4 class="text-gold mb-0">Missões: {{ course.title }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for mission in missions %}
+                        <div class="col-md-6 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ mission.title }}</h5>
+                                    <p class="card-text">{{ mission.description }}</p>
+                                    <div class="mt-3">
+                                        <span class="badge bg-gold text-dark">
+                                            <i class="fas fa-star me-1"></i>{{ mission.xp_reward }} XP
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <a href="{{ url_for('main.view_mission', course_id=course.id, mission_id=mission.id) }}" 
+                                       class="btn btn-outline-gold w-100">
+                                        Iniciar Missão
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
