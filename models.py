@@ -32,6 +32,7 @@ class User(UserMixin, db.Model):
     xp = db.Column(db.Integer, default=0)
     level = db.Column(db.Integer, default=1)
     is_active = db.Column(db.Boolean, default=False)
+    registration_status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     reset_token = db.Column(db.String(100), nullable=True)

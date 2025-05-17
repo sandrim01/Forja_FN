@@ -203,11 +203,15 @@ def admin_dashboard():
     total_payments = len(completed_payments)
     total_revenue = sum(payment.amount for payment in completed_payments)
     
+    # Get pending registrations
+    pending_registrations = User.query.filter_by(registration_status='pending').order_by(desc(User.created_at)).all()
+    
     # Recent users and payments
     recent_users = User.query.order_by(desc(User.created_at)).limit(10).all()
     recent_payments = Payment.query.order_by(desc(Payment.created_at)).limit(5).all()
     
     return render_template('admin/dashboard.html',
+                          pending_registrations=pending_registrations,
                           title='Painel Administrativo',
                           total_users=total_users,
                           total_courses=total_courses,
@@ -249,6 +253,26 @@ def update_user(user_id):
     user.email = data.get('email', user.email)
     user.is_active = data.get('is_active', user.is_active)
     
+    db.session.commit()
+    return jsonify({'success': True})
+
+@main_bp.route('/admin/registrations/<int:user_id>/approve', methods=['POST'])
+@login_required
+@requires_roles('admin')
+def approve_registration(user_id):
+    user = User.query.get_or_404(user_id)
+    user.registration_status = 'approved'
+    user.is_active = True
+    db.session.commit()
+    return jsonify({'success': True})
+
+@main_bp.route('/admin/registrations/<int:user_id>/reject', methods=['POST'])
+@login_required
+@requires_roles('admin')
+def reject_registration(user_id):
+    user = User.query.get_or_404(user_id)
+    user.registration_status = 'rejected'
+    user.is_active = False
     db.session.commit()
     return jsonify({'success': True})
 
