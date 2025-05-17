@@ -92,6 +92,10 @@
                                     <button type="button" class="btn btn-sm btn-outline-gold" onclick="editUser({{ user.id }})">
                                         <i class="fas fa-edit"></i>
                                     </button>
+                                    <button type="button" class="btn btn-sm {% if user.is_active %}btn-outline-danger{% else %}btn-outline-success{% endif %}" 
+                                            onclick="toggleUserStatus({{ user.id }}, {{ user.is_active|tojson }})">
+                                        <i class="fas {% if user.is_active %}fa-user-slash{% else %}fa-user-check{% endif %}"></i>
+                                    </button>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }})">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -145,6 +149,47 @@
 
 {% block extra_js %}
 <script>
+function toggleUserStatus(userId, currentStatus) {
+    fetch(`/admin/users/${userId}/toggle-status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Erro ao alterar status do usuário');
+        }
+    });
+}
+
+function saveUser() {
+    const form = document.getElementById('addUserForm');
+    const formData = new FormData(form);
+
+    fetch('/admin/users/add', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+            const modal = document.getElementById('addUserModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
+        } else {
+            alert('Erro ao adicionar usuário: ' + (data.message || 'Erro desconhecido'));
+        }
+    })
+    .catch(error => {
+        alert('Erro ao adicionar usuário: ' + error);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Search functionality
 

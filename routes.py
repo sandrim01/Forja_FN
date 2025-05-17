@@ -237,6 +237,18 @@ def delete_user(user_id):
         return jsonify({'success': True})
     return jsonify({'success': False, 'message': 'Cannot delete admin user'})
 
+@main_bp.route('/admin/users/<int:user_id>/toggle-status', methods=['POST'])
+@login_required
+@requires_roles('admin')
+def toggle_user_status(user_id):
+    try:
+        user = User.query.get_or_404(user_id)
+        user.is_active = not user.is_active
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
 @main_bp.route('/admin/users/<int:user_id>', methods=['PUT'])
 @login_required
 @requires_roles('admin')
