@@ -222,60 +222,9 @@ def admin_dashboard():
 @requires_roles('admin')
 def admin_users():
     users = User.query.all()
-    pending_users = User.query.filter_by(is_approved=False).all()
     return render_template('admin/users.html',
                           title='Gerenciar Usuários',
-                          users=users,
-                          pending_users=pending_users)
-
-@main_bp.route('/admin/users/<int:user_id>/approve', methods=['POST'])
-@login_required
-@requires_roles('admin')
-def approve_user(user_id):
-    user = User.query.get_or_404(user_id)
-    user.is_approved = True
-    user.is_active = True
-    db.session.commit()
-    return jsonify({'success': True})
-
-@main_bp.route('/admin/users/<int:user_id>', methods=['DELETE'])
-@login_required
-@requires_roles('admin')
-def delete_user(user_id):
-    user = User.query.get_or_404(user_id)
-    db.session.delete(user)
-    db.session.commit()
-    return jsonify({'success': True})
-
-@main_bp.route('/admin/users/<int:user_id>/edit', methods=['GET', 'POST'])
-@login_required
-@requires_roles('admin')
-def edit_user(user_id):
-    user = User.query.get_or_404(user_id)
-    if request.method == 'POST':
-        user.first_name = request.form.get('first_name')
-        user.last_name = request.form.get('last_name')
-        user.email = request.form.get('email')
-        db.session.commit()
-        return jsonify({'success': True})
-    return render_template('admin/edit_user.html', user=user)
-
-@main_bp.route('/admin/users/<int:user_id>/payments', methods=['GET', 'POST'])
-@login_required
-@requires_roles('admin')
-def manage_user_payments(user_id):
-    user = User.query.get_or_404(user_id)
-    if request.method == 'POST':
-        payment = Payment(
-            amount=request.form.get('amount'),
-            status='completed',
-            payment_method='manual',
-            user_id=user.id
-        )
-        db.session.add(payment)
-        db.session.commit()
-        return jsonify({'success': True})
-    return render_template('admin/user_payments.html', user=user)
+                          users=users)
 
 @main_bp.route('/admin/courses')
 @login_required

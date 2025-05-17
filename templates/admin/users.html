@@ -1,4 +1,3 @@
-
 {% extends "layout.html" %}
 
 {% block content %}
@@ -30,7 +29,6 @@
                     <select class="form-select" id="userStatus">
                         <option value="all">Todos os Status</option>
                         <option value="active">Ativos</option>
-                        <option value="pending">Pendentes</option>
                         <option value="inactive">Inativos</option>
                     </select>
                 </div>
@@ -45,10 +43,12 @@
                 <table class="table table-hover align-middle">
                     <thead class="bg-navy text-gold">
                         <tr>
+                            <th>
+                                <input type="checkbox" class="form-check-input" id="selectAll">
+                            </th>
                             <th>Nome</th>
                             <th>Email</th>
                             <th>Status</th>
-                            <th>Mensalidade</th>
                             <th>Cursos</th>
                             <th>Ações</th>
                         </tr>
@@ -57,13 +57,16 @@
                         {% for user in users %}
                         <tr>
                             <td>
+                                <input type="checkbox" class="form-check-input user-select">
+                            </td>
+                            <td>
                                 <div class="d-flex align-items-center">
                                     <div class="avatar me-3">
                                         {% if user.profile_image_url %}
                                             <img src="{{ user.profile_image_url }}" class="rounded-circle" width="40">
                                         {% else %}
                                             <div class="rounded-circle bg-navy text-gold d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                                {{ user.first_name[0] if user.first_name }}{{ user.last_name[0] if user.last_name }}
+                                                {{ user.first_name[0] }}{{ user.last_name[0] }}
                                             </div>
                                         {% endif %}
                                     </div>
@@ -75,21 +78,10 @@
                             </td>
                             <td>{{ user.email }}</td>
                             <td>
-                                {% if user.is_approved %}
-                                    {% if user.is_active %}
-                                        <span class="badge bg-success">Ativo</span>
-                                    {% else %}
-                                        <span class="badge bg-warning">Inativo</span>
-                                    {% endif %}
+                                {% if user.is_active %}
+                                    <span class="badge bg-success">Ativo</span>
                                 {% else %}
-                                    <span class="badge bg-danger">Pendente</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if user.last_payment %}
-                                    <span class="badge bg-success">Em dia</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Pendente</span>
+                                    <span class="badge bg-danger">Inativo</span>
                                 {% endif %}
                             </td>
                             <td>
@@ -97,16 +89,8 @@
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    {% if not user.is_approved %}
-                                    <button type="button" class="btn btn-sm btn-success" onclick="approveUser({{ user.id }})">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                    {% endif %}
                                     <button type="button" class="btn btn-sm btn-outline-gold" onclick="editUser({{ user.id }})">
                                         <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="managePayment({{ user.id }})">
-                                        <i class="fas fa-file-invoice-dollar"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteUser({{ user.id }})">
                                         <i class="fas fa-trash"></i>
@@ -122,34 +106,74 @@
     </div>
 </div>
 
-<!-- Modals for user management here -->
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header bg-navy">
+                <h5 class="modal-title text-gold">Adicionar Novo Aluno</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" class="form-control" name="first_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sobrenome</label>
+                        <input type="text" class="form-control" name="last_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Senha</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-gold" onclick="saveUser()">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
+{% block extra_js %}
 <script>
-function approveUser(userId) {
-    if (confirm('Deseja aprovar este aluno?')) {
-        fetch(`/admin/users/${userId}/approve`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('userSearch');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const name = row.querySelector('.fw-bold').textContent.toLowerCase();
+            const email = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+
+            if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
             }
         });
-    }
-}
+    });
+
+    // Select all checkbox
+    const selectAll = document.getElementById('selectAll');
+    selectAll.addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.user-select');
+        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+    });
+});
 
 function editUser(userId) {
     // Implement edit user logic
-    window.location.href = `/admin/users/${userId}/edit`;
-}
-
-function managePayment(userId) {
-    // Implement payment management logic
-    window.location.href = `/admin/users/${userId}/payments`;
 }
 
 function deleteUser(userId) {
@@ -169,30 +193,20 @@ function deleteUser(userId) {
     }
 }
 
-// Search and filter functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('userSearch');
-    const statusSelect = document.getElementById('userStatus');
+function saveUser() {
+    const form = document.getElementById('addUserForm');
+    const formData = new FormData(form);
 
-    function filterUsers() {
-        const searchTerm = searchInput.value.toLowerCase();
-        const status = statusSelect.value;
-        const rows = document.querySelectorAll('tbody tr');
-
-        rows.forEach(row => {
-            const name = row.querySelector('.fw-bold').textContent.toLowerCase();
-            const email = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-            const userStatus = row.querySelector('td:nth-child(3) .badge').textContent.toLowerCase();
-
-            const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-            const matchesStatus = status === 'all' || userStatus.includes(status);
-
-            row.style.display = matchesSearch && matchesStatus ? '' : 'none';
-        });
-    }
-
-    searchInput.addEventListener('input', filterUsers);
-    statusSelect.addEventListener('change', filterUsers);
-});
+    fetch('/admin/users/add', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
 </script>
 {% endblock %}
