@@ -1,3 +1,4 @@
+
 {% extends "layout.html" %}
 
 {% block content %}
@@ -16,9 +17,9 @@
         <div class="col-md-3">
             <div class="card bg-navy h-100">
                 <div class="card-body text-center">
-                    <i class="fas fa-graduation-cap fa-3x text-gold mb-3"></i>
-                    <h3 class="text-gold">{{ total_courses }}</h3>
-                    <p class="text-light mb-0">Cursos</p>
+                    <i class="fas fa-user-clock fa-3x text-gold mb-3"></i>
+                    <h3 class="text-gold">{{ pending_approvals }}</h3>
+                    <p class="text-light mb-0">Pendentes</p>
                 </div>
             </div>
         </div>
@@ -35,8 +36,48 @@
             <div class="card bg-navy h-100">
                 <div class="card-body text-center">
                     <i class="fas fa-chart-line fa-3x text-gold mb-3"></i>
-                    <h3 class="text-gold">{{ total_payments }}</h3>
-                    <p class="text-light mb-0">Vendas</p>
+                    <h3 class="text-gold">{{ monthly_payments }}</h3>
+                    <p class="text-light mb-0">Mensalidades Pagas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Registrations -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-navy">
+                    <h5 class="text-gold mb-0">Solicitações de Registro Pendentes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Data</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in pending_users %}
+                                <tr>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
+                                    <td>
+                                        <button onclick="approveUser({{ user.id }})" class="btn btn-sm btn-gold">
+                                            <i class="fas fa-check"></i> Aprovar
+                                        </button>
+                                        <button onclick="deleteUser({{ user.id }})" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-times"></i> Recusar
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -58,8 +99,8 @@
                             </a>
                         </div>
                         <div class="col-md-3">
-                            <a href="#" class="btn btn-outline-gold w-100 p-3">
-                                <i class="fas fa-chart-bar me-2"></i>Relatórios
+                            <a href="{{ url_for('main.admin_payments') }}" class="btn btn-outline-gold w-100 p-3">
+                                <i class="fas fa-file-invoice-dollar me-2"></i>Mensalidades
                             </a>
                         </div>
                         <div class="col-md-3">
@@ -71,83 +112,42 @@
                 </div>
             </div>
         </div>
-
-        <!-- Recent Users -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-navy">
-                    <h5 class="text-gold mb-0">Alunos Recentes</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Nome</th>
-                                    <th>Email</th>
-                                    <th>Data</th>
-                                    <th>Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for user in recent_users %}
-                                <tr>
-                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button class="btn btn-outline-gold">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="btn btn-outline-danger">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Payments -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header bg-navy">
-                    <h5 class="text-gold mb-0">Pagamentos Recentes</h5>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Aluno</th>
-                                    <th>Curso</th>
-                                    <th>Valor</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for payment in recent_payments %}
-                                <tr>
-                                    <td>{{ payment.user.username }}</td>
-                                    <td>{{ payment.course.title }}</td>
-                                    <td>R$ {{ "%.2f"|format(payment.amount) }}</td>
-                                    <td>
-                                        <span class="badge bg-success">{{ payment.status }}</span>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
+
+<script>
+function approveUser(userId) {
+    if (confirm('Deseja aprovar este aluno?')) {
+        fetch(`/admin/users/${userId}/approve`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('Tem certeza que deseja excluir este aluno?')) {
+        fetch(`/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
 {% endblock %}
