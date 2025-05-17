@@ -147,6 +147,44 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Search functionality
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header bg-navy">
+                <h5 class="modal-title text-gold">Editar Aluno</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="editFirstName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sobrenome</label>
+                        <input type="text" class="form-control" id="editLastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" required>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="editIsActive">
+                        <label class="form-check-label">Usuário Ativo</label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-gold" onclick="saveUserEdit()">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     const searchInput = document.getElementById('userSearch');
     searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
@@ -173,7 +211,53 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function editUser(userId) {
-    // Implement edit user logic
+    const row = document.querySelector(`tr[data-user-id="${userId}"]`);
+    const firstName = row.querySelector('.user-firstname').textContent;
+    const lastName = row.querySelector('.user-lastname').textContent;
+    const email = row.querySelector('.user-email').textContent;
+    const isActive = row.querySelector('.user-status').classList.contains('bg-success');
+    
+    const userData = {
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        is_active: isActive
+    };
+    
+    // Update form fields
+    document.getElementById('editFirstName').value = userData.first_name;
+    document.getElementById('editLastName').value = userData.last_name;
+    document.getElementById('editEmail').value = userData.email;
+    document.getElementById('editIsActive').checked = userData.is_active;
+    document.getElementById('editUserId').value = userId;
+    
+    // Show modal
+    const editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+    editModal.show();
+}
+
+function saveUserEdit() {
+    const userId = document.getElementById('editUserId').value;
+    const userData = {
+        first_name: document.getElementById('editFirstName').value,
+        last_name: document.getElementById('editLastName').value,
+        email: document.getElementById('editEmail').value,
+        is_active: document.getElementById('editIsActive').checked
+    };
+    
+    fetch(`/admin/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
 }
 
 function deleteUser(userId) {
@@ -188,6 +272,8 @@ function deleteUser(userId) {
         .then(data => {
             if (data.success) {
                 location.reload();
+            } else if (data.message) {
+                alert(data.message);
             }
         });
     }

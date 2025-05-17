@@ -226,6 +226,32 @@ def admin_users():
                           title='Gerenciar Usuários',
                           users=users)
 
+@main_bp.route('/admin/users/<int:user_id>', methods=['DELETE'])
+@login_required
+@requires_roles('admin')
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.username != 'admin':
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({'success': True})
+    return jsonify({'success': False, 'message': 'Cannot delete admin user'})
+
+@main_bp.route('/admin/users/<int:user_id>', methods=['PUT'])
+@login_required
+@requires_roles('admin')
+def update_user(user_id):
+    user = User.query.get_or_404(user_id)
+    data = request.json
+    
+    user.first_name = data.get('first_name', user.first_name)
+    user.last_name = data.get('last_name', user.last_name)
+    user.email = data.get('email', user.email)
+    user.is_active = data.get('is_active', user.is_active)
+    
+    db.session.commit()
+    return jsonify({'success': True})
+
 @main_bp.route('/admin/courses')
 @login_required
 @requires_roles('admin')
