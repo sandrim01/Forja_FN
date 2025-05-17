@@ -150,20 +150,54 @@
 {% block extra_js %}
 <script>
 function toggleUserStatus(userId, currentStatus) {
-    fetch(`/admin/users/${userId}/toggle-status`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            location.reload();
-        } else {
-            alert('Erro ao alterar status do usuário');
-        }
-    });
+    const action = currentStatus ? 'desativar' : 'ativar';
+    const modal = new bootstrap.Modal(document.getElementById('confirmActionModal'));
+    document.getElementById('confirmActionText').textContent = `Tem certeza que deseja ${action} este usuário?`;
+    
+    document.getElementById('confirmActionBtn').onclick = function() {
+        fetch(`/admin/users/${userId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao alterar status do usuário');
+            }
+        });
+        modal.hide();
+    };
+    
+    modal.show();
+}
+
+function deleteUser(userId) {
+    const modal = new bootstrap.Modal(document.getElementById('confirmActionModal'));
+    document.getElementById('confirmActionText').textContent = 'Tem certeza que deseja excluir este usuário?';
+    
+    document.getElementById('confirmActionBtn').onclick = function() {
+        fetch(`/admin/users/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else if (data.message) {
+                alert(data.message);
+            }
+        });
+        modal.hide();
+    };
+    
+    modal.show();
 }
 
 function saveUser() {
@@ -178,6 +212,26 @@ function saveUser() {
     .then(data => {
         if (data.success) {
             location.reload();
+
+<!-- Confirm Action Modal -->
+<div class="modal fade" id="confirmActionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark">
+            <div class="modal-header bg-navy">
+                <h5 class="modal-title text-gold">Confirmar Ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmActionText" class="mb-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-gold" id="confirmActionBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
             const modal = document.getElementById('addUserModal');
             const modalInstance = bootstrap.Modal.getInstance(modal);
             modalInstance.hide();
