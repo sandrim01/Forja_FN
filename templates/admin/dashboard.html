@@ -45,8 +45,9 @@
         <!-- Pending Registrations -->
         <div class="col-12">
             <div class="card">
-                <div class="card-header bg-navy">
+                <div class="card-header bg-navy d-flex justify-content-between align-items-center">
                     <h5 class="text-gold mb-0">Solicitações de Registro Pendentes</h5>
+                    <span class="badge bg-danger">{{ pending_users|length }}</span>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -56,6 +57,7 @@
                                     <th>Nome</th>
                                     <th>Email</th>
                                     <th>Data</th>
+                                    <th>Status</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
@@ -66,12 +68,19 @@
                                     <td>{{ user.email }}</td>
                                     <td>{{ user.created_at.strftime('%d/%m/%Y') }}</td>
                                     <td>
-                                        <button onclick="approveUser({{ user.id }})" class="btn btn-sm btn-gold">
-                                            <i class="fas fa-check"></i> Aprovar
-                                        </button>
-                                        <button onclick="deleteUser({{ user.id }})" class="btn btn-sm btn-danger">
-                                            <i class="fas fa-times"></i> Recusar
-                                        </button>
+                                        {% if not user.is_approved %}
+                                            <span class="badge bg-warning">Pendente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button onclick="approveUser({{ user.id }})" class="btn btn-sm btn-gold">
+                                                <i class="fas fa-check"></i> Aprovar
+                                            </button>
+                                            <button onclick="deleteUser({{ user.id }})" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-times"></i> Recusar
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}

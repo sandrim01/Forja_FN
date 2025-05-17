@@ -33,6 +33,7 @@ class User(UserMixin, db.Model):
     level = db.Column(db.Integer, default=1)
     is_active = db.Column(db.Boolean, default=False)
     is_approved = db.Column(db.Boolean, default=False)
+    is_approved = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     reset_token = db.Column(db.String(100), nullable=True)

@@ -222,9 +222,11 @@ def admin_dashboard():
 @requires_roles('admin')
 def admin_users():
     users = User.query.all()
+    pending_users = User.query.filter_by(is_approved=False).all()
     return render_template('admin/users.html',
                           title='Gerenciar Usuários',
-                          users=users)
+                          users=users,
+                          pending_users=pending_users)
 
 @main_bp.route('/admin/users/<int:user_id>/approve', methods=['POST'])
 @login_required
