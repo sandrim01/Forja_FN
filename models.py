@@ -25,10 +25,6 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    registration_status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
-    monthly_payment_status = db.Column(db.String(20), default='pending')  # pending, paid, overdue
-    last_payment_date = db.Column(db.DateTime)
-    next_payment_due = db.Column(db.DateTime)
     password_hash = db.Column(db.String(256), nullable=False)
     first_name = db.Column(db.String(64))
     last_name = db.Column(db.String(64))
