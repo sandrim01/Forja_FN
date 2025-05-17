@@ -291,7 +291,15 @@ function saveUser() {
     .then(data => {
         if (data.success) {
             location.reload();
+            const modal = document.getElementById('addUserModal');
+            const modalInstance = bootstrap.Modal.getInstance(modal);
+            modalInstance.hide();
+        } else {
+            alert('Erro ao adicionar usuário: ' + (data.message || 'Erro desconhecido'));
         }
+    })
+    .catch(error => {
+        alert('Erro ao adicionar usuário: ' + error);
     });
 }
 </script>

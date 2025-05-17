@@ -252,6 +252,34 @@ def update_user(user_id):
     db.session.commit()
     return jsonify({'success': True})
 
+@main_bp.route('/admin/users/add', methods=['POST'])
+@login_required
+@requires_roles('admin')
+def add_user():
+    try:
+        data = request.form
+        
+        # Create new user
+        user = User()
+        user.username = data['email'].split('@')[0]  # Use email prefix as username
+        user.email = data['email']
+        user.first_name = data['first_name']
+        user.last_name = data['last_name']
+        user.set_password(data['password'])
+        user.is_active = True
+        
+        # Add student role
+        student_role = Role.query.filter_by(name='student').first()
+        if student_role:
+            user.roles.append(student_role)
+        
+        db.session.add(user)
+        db.session.commit()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
 @main_bp.route('/admin/courses')
 @login_required
 @requires_roles('admin')
