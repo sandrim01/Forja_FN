@@ -78,10 +78,12 @@ def profile():
 
 @main_bp.route('/courses')
 def courses():
+    from models import User, Course
     all_courses = Course.query.all()
     return render_template('courses/index.html', 
                           title='Cursos Disponíveis',
-                          courses=all_courses)
+                          courses=all_courses,
+                          User=User)
 
 @main_bp.route('/courses/<int:course_id>')
 def view_course(course_id):
