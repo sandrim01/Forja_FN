@@ -1,0 +1,170 @@
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h1 class="text-gold">Criar Novo Curso</h1>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <button type="button" class="btn btn-gold me-2" data-bs-toggle="modal" data-bs-target="#createCourseModal">
+                <i class="fas fa-plus me-2"></i>Novo Curso
+            </button>
+            <button type="button" class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#questionBankModal">
+                <i class="fas fa-question-circle me-2"></i>Banco de Questões
+            </button>
+        </div>
+    </div>
+
+    <!-- Modais -->
+    <!-- Modal de Criação de Curso -->
+    <div class="modal fade" id="createCourseModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content bg-navy">
+                <div class="modal-header">
+                    <h5 class="modal-title text-gold">Criar Novo Curso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="courseForm">
+                        <div class="mb-3">
+                            <label class="form-label">Título do Curso</label>
+                            <input type="text" class="form-control" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descrição</label>
+                            <textarea class="form-control" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Preço</label>
+                            <input type="number" class="form-control" name="price" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Imagem de Capa</label>
+                            <input type="file" class="form-control" name="thumbnail">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-gold" onclick="saveCourse()">Salvar Curso</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal do Banco de Questões -->
+    <div class="modal fade" id="questionBankModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content bg-navy">
+                <div class="modal-header">
+                    <h5 class="modal-title text-gold">Banco de Questões</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <button class="btn btn-gold" onclick="addNewQuestion()">
+                            <i class="fas fa-plus me-2"></i>Nova Questão
+                        </button>
+                    </div>
+                    <div id="questionsList">
+                        <!-- Questões serão carregadas aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function saveCourse() {
+    const form = document.getElementById('courseForm');
+    const formData = new FormData(form);
+    
+    fetch('/api/courses/create', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/admin/courses';
+        } else {
+            alert('Erro ao criar curso: ' + data.message);
+        }
+    });
+}
+
+function addNewQuestion() {
+    const questionHtml = `
+        <div class="card mb-3">
+            <div class="card-body">
+                <form class="question-form">
+                    <div class="mb-3">
+                        <label class="form-label">Pergunta</label>
+                        <textarea class="form-control" name="question" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Alternativas</label>
+                        <div class="alternatives">
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">A</span>
+                                <input type="text" class="form-control" name="alternative_a" required>
+                                <div class="input-group-text">
+                                    <input type="radio" name="correct_answer" value="a" required>
+                                </div>
+                            </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">B</span>
+                                <input type="text" class="form-control" name="alternative_b" required>
+                                <div class="input-group-text">
+                                    <input type="radio" name="correct_answer" value="b">
+                                </div>
+                            </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">C</span>
+                                <input type="text" class="form-control" name="alternative_c" required>
+                                <div class="input-group-text">
+                                    <input type="radio" name="correct_answer" value="c">
+                                </div>
+                            </div>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">D</span>
+                                <input type="text" class="form-control" name="alternative_d" required>
+                                <div class="input-group-text">
+                                    <input type="radio" name="correct_answer" value="d">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-gold" onclick="saveQuestion(this)">Salvar Questão</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.getElementById('questionsList').insertAdjacentHTML('beforeend', questionHtml);
+}
+
+function saveQuestion(button) {
+    const form = button.closest('form');
+    const formData = new FormData(form);
+    
+    fetch('/api/questions/create', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            form.reset();
+            alert('Questão salva com sucesso!');
+        } else {
+            alert('Erro ao salvar questão: ' + data.message);
+        }
+    });
+}
+</script>
+{% endblock %}

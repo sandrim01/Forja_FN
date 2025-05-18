@@ -338,6 +338,61 @@ def admin_courses():
                           title='Gerenciar Cursos',
                           courses=courses)
 
+@main_bp.route('/admin/courses/create', methods=['GET'])
+@login_required
+@requires_roles('admin')
+def create_course_page():
+    return render_template('courses/create.html',
+                          title='Criar Novo Curso')
+
+@main_bp.route('/api/courses/create', methods=['POST'])
+@login_required
+@requires_roles('admin')
+def create_course_api():
+    try:
+        form = request.form
+        course = Course(
+            title=form['title'],
+            description=form['description'],
+            price=float(form['price']),
+            author_id=current_user.id
+        )
+        
+        if 'thumbnail' in request.files:
+            file = request.files['thumbnail']
+            if file:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(current_app.config['UPLOAD_FOLDER'], filename))
+                course.thumbnail_url = filename
+        
+        db.session.add(course)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
+@main_bp.route('/api/questions/create', methods=['POST'])
+@login_required
+@requires_roles('admin')
+def create_question_api():
+    try:
+        form = request.form
+        question = MissionQuestion(
+            question_text=form['question'],
+            choices=json.dumps({
+                'a': form['alternative_a'],
+                'b': form['alternative_b'],
+                'c': form['alternative_c'],
+                'd': form['alternative_d']
+            }),
+            correct_answer=form['correct_answer']
+        )
+        db.session.add(question)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)})
+
 # Teacher routes
 @main_bp.route('/teacher')
 @login_required
